@@ -31,7 +31,7 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
         :search-input="false"
         :portal="false"
         multiple
-        placeholder="alle stages"
+        placeholder="alle podia"
         class="w-36"
       />
       <USelectMenu

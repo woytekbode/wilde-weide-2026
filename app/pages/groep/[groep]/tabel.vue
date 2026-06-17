@@ -107,6 +107,6 @@ function onSelect(_e: Event, row: TableRow<Act>) {
       />
     </div>
 
-    <p class="text-sm font-bold">{{ filteredActs.length }} acts</p>
+    <p class="text-sm font-bold">{{ filteredActs.length }} artiesten</p>
   </div>
 </template>

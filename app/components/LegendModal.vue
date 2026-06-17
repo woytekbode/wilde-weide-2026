@@ -53,7 +53,7 @@ if (import.meta.client) {
                 >Kas</span>
               </div>
               <p class="text-sm">
-                <span class="font-bold">Verberg stage</span> tik op de stage naam en hij verdwijnt.
+                <span class="font-bold">Verberg podium</span> tik op de podiumnaam en hij verdwijnt.
               </p>
             </div>
 

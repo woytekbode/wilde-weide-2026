@@ -1,6 +1,6 @@
 import { GROEP_LS_KEY, GROEPSWISSEL_QUERY, isGeldigeGroepSlug } from '#shared/groep'
 
-const LEGACY_PADEN = ['/tabel', '/acts', '/sfeer', '/stages']
+const LEGACY_PADEN = ['/tabel', '/artiesten', '/sfeer', '/podia']
 
 /**
  * Routing rond groepen: oude deep links zonder groep doorsturen naar de

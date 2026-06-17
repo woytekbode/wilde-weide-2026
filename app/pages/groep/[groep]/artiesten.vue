@@ -56,6 +56,6 @@ function dayShort(act: Act): string {
       </button>
     </div>
 
-    <p class="text-sm font-bold">{{ filteredActs.length }} acts</p>
+    <p class="text-sm font-bold">{{ filteredActs.length }} artiesten</p>
   </div>
 </template>
