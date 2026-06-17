@@ -1,0 +1,28 @@
+{
+  "name": "wilde-weide-timetable",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "backup-kv": "node scripts/backup-kv.mjs"
+  },
+  "dependencies": {
+    "@nuxt/fonts": "^0.14.0",
+    "@nuxt/ui": "^4.8.2",
+    "nuxt": "^4.4.8",
+    "vue": "^3.5.37",
+    "vue-router": "^5.1.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.111",
+    "@types/node": "^25.9.3",
+    "playwright": "^1.60.0",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.4"
+  }
+}

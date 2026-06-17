@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "wildeweide",
+  "compatibility_date": "2026-06-11",
+  "main": "worker/index.ts",
+  "assets": {
+    "directory": "./.output/public",
+    "not_found_handling": "404-page",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SCORES",
+      "id": "dd0b208488e04a2ea2dfff9fd75167a5"
+    }
+  ]
+}

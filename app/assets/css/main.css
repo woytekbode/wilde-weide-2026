@@ -1,0 +1,220 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  --font-sans: "Schibsted Grotesk", sans-serif;
+  --font-display: "Fraunces", serif;
+
+  /* lila — wildeweide.nl theme-one #a48dbe */
+  --color-lila-50: #f7f4fa;
+  --color-lila-100: #efe9f5;
+  --color-lila-200: #dfd3ea;
+  --color-lila-300: #cdbadd;
+  --color-lila-400: #b8a3cd;
+  --color-lila-500: #a48dbe;
+  --color-lila-600: #8a6fa8;
+  --color-lila-700: #71588c;
+  --color-lila-800: #5a4670;
+  --color-lila-900: #483a59;
+  --color-lila-950: #2d2438;
+
+  /* oker — wildeweide.nl theme-two #c59d4e */
+  --color-oker-50: #faf6ec;
+  --color-oker-100: #f4ebd3;
+  --color-oker-200: #e9d6a6;
+  --color-oker-300: #dcbf78;
+  --color-oker-400: #d0ad5f;
+  --color-oker-500: #c59d4e;
+  --color-oker-600: #a98140;
+  --color-oker-700: #876535;
+  --color-oker-800: #6b502c;
+  --color-oker-900: #574226;
+  --color-oker-950: #322413;
+
+  /* veld — eigen groen voor de derde festivaldag */
+  --color-veld-50: #f3f7ee;
+  --color-veld-100: #e5eeda;
+  --color-veld-200: #ccddb6;
+  --color-veld-300: #b0c98f;
+  --color-veld-400: #97b471;
+  --color-veld-500: #7fa05a;
+  --color-veld-600: #65854a;
+  --color-veld-700: #4f683b;
+  --color-veld-800: #40522f;
+  --color-veld-900: #354428;
+  --color-veld-950: #1c2514;
+}
+
+:root {
+  --ui-radius: 0.6rem;
+}
+
+/* Reserveer altijd ruimte voor de scrollbar, zodat de gecentreerde max-w-7xl
+   layout (incl. titel) niet verspringt tussen korte en scrollende pagina's.
+   De gutter krijgt de paginakleur (via --ww-page-bg, gezet in de layout) zodat
+   hij naadloos in de achtergrond opgaat; de thumb is een zwarte pill met wat
+   doorzichtigheid. */
+html {
+  scrollbar-gutter: stable;
+  background-color: var(--ww-page-bg, var(--color-lila-500));
+  transition: background-color 300ms;
+}
+
+/* Tijdens een open modal (klasse gezet in ActDetailsSlideover.vue): vergrendel
+   het scrollen op <html> zelf. De scrollbar verdwijnt, maar scrollbar-gutter:
+   stable houdt de 14px gereserveerd — geen layout-sprong en geen losse gutter
+   naast de modal. Gebruik fixed inset-0 voor de overlay (geen 100vw, dat kan
+   juist horizontale overflow geven). */
+html.modal-open {
+  overflow: hidden;
+}
+
+/* Firefox (en andere browsers zonder ::-webkit-scrollbar): standaard
+   scrollbar-eigenschappen. Belangrijk: deze NIET op WebKit/Blink zetten —
+   zodra scrollbar-width/-color aanwezig is, negeert Chrome/Edge álle
+   ::-webkit-scrollbar-regels (geen 20px, geen pill, pijltjes terug). */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+  }
+}
+
+/* WebKit/Blink: transparante track (toont de paginakleur eronder), thumb als pill */
+html::-webkit-scrollbar {
+  width: 14px;
+}
+/* geen op/neer-pijlknoppen */
+html::-webkit-scrollbar-button,
+html::-webkit-scrollbar-button:vertical:start,
+html::-webkit-scrollbar-button:vertical:end {
+  display: none;
+  width: 0;
+  height: 0;
+}
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+html::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background-color: rgba(0, 0, 0, 0.35);
+  /* doorzichtige rand + padding-box clip houdt de pill smal binnen de gutter */
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+body {
+  @apply font-sans text-black antialiased;
+}
+
+h1, h2, h3, h4 {
+  @apply font-display;
+}
+
+/* Chunky zwart-omlijnde kaart met offset-schaduw, losjes naar wildeweide.nl */
+.ww-card {
+  @apply rounded-(--ui-radius) border-[3px] border-black bg-white;
+  box-shadow: 4px 4px 0 0 #000;
+}
+
+.ww-card-flat {
+  @apply rounded-(--ui-radius) border-[3px] border-black bg-white;
+}
+
+/* Knoppen: contrast-inversie op hover zoals op de festivalsite */
+.ww-btn {
+  @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-white px-4 py-1.5 font-sans font-bold text-black transition-colors duration-200;
+}
+.ww-btn:hover {
+  @apply bg-black text-white;
+}
+
+.ww-btn-solid {
+  @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-black px-4 py-1.5 font-sans font-bold text-white transition-colors duration-200;
+}
+.ww-btn-solid:hover {
+  @apply bg-white text-black;
+}
+
+/* ronde icoonknop rechts in een ww-btn-solid: kleuren tegengesteld aan de knop
+   (witte cirkel, zwart icoon) en mee-inverterend op hover */
+.ww-btn-circle {
+  @apply flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-black transition-colors duration-200;
+}
+.ww-btn-solid:hover .ww-btn-circle {
+  @apply bg-black text-white;
+}
+
+/* Navigatie (dagen + hoofdmenu): alleen outline, actief = zwart gevuld met
+   tekst in de paginakleur */
+.ww-nav-btn {
+  @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-transparent px-4 py-1.5 font-sans font-bold text-black transition-colors duration-200;
+}
+.ww-nav-btn:hover,
+.ww-nav-btn-active,
+.ww-nav-btn-active:hover {
+  @apply bg-black;
+  color: var(--ww-accent, var(--color-lila-500));
+}
+
+/* Blokkenschema, stage verbergen/tonen: tegels van de stage klappen naar hun
+   midden dicht (of open), de rest schuift mee via per-tegel view transitions.
+   Browsers zonder ondersteuning togglen gewoon zonder animatie. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(*) {
+    animation-duration: 300ms;
+  }
+  ::view-transition-old(.ww-tile):only-child {
+    animation: ww-collapse 250ms ease-in forwards;
+  }
+  ::view-transition-new(.ww-tile):only-child {
+    animation: ww-collapse 250ms ease-out reverse;
+  }
+  /* De stagechip is in de kolomkop veel breder dan in de filterbalk. Standaard
+     houden de snapshots hun aspect ratio vast (width: auto), waardoor de chip
+     direct na de klik enorm opblaast; meeschalen met het bewegende groepskader
+     geeft één vloeiende morph. */
+  ::view-transition-old(.ww-chip),
+  ::view-transition-new(.ww-chip) {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@keyframes ww-collapse {
+  to {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+/* Eenmalige onboarding-hint: stagechips squishen na elkaar (per-chip
+   animation-delay in de template) zodat duidelijk wordt dat je ze kunt aantikken
+   — dezelfde squish-affordance als de hover op desktop. JS speelt 'm alleen
+   zonder prefers-reduced-motion; de media-query hier is een extra vangnet. */
+@media (prefers-reduced-motion: no-preference) {
+  .ww-stage-squish {
+    animation: ww-stage-squish 500ms ease-in-out;
+  }
+}
+
+@keyframes ww-stage-squish {
+  0%   { transform: scale(1, 1);       }
+  30%  { transform: scale(1.06, 0.84); }
+  55%  { transform: scale(0.96, 1.08); }
+  80%  { transform: scale(1.02, 0.97); }
+  100% { transform: scale(1, 1);       }
+}
+
+/* Actieve toestand: gevuld met de paginakleur + zwarte rand */
+.ww-btn-active {
+  background-color: var(--ww-accent, var(--color-lila-500));
+  @apply text-black;
+}
+.ww-btn-active:hover {
+  background-color: var(--ww-accent, var(--color-lila-500));
+  @apply text-black;
+}
