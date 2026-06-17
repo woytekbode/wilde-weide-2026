@@ -213,7 +213,7 @@ function placeTent(clientX: number, clientY: number) {
         <div
           v-if="tent"
           class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
-          :style="{ left: `${tent.fx * 100}%`, top: `${tent.fy * 100}%`, width: 'clamp(16px, 4%, 50px)' }"
+          :style="{ left: `${tent.fx * 100}%`, top: `${tent.fy * 100}%`, width: 'clamp(16px, 5%, 50px)' }"
         >
           <svg viewBox="0 0 32 32" class="block w-full drop-shadow-sm">
             <circle cx="16" cy="16" r="14" fill="#a48dbe" stroke="#000" stroke-width="2" />
