@@ -34,6 +34,18 @@ function clickHeart(n: number) {
 // klik de score; toon de gevulde hartjes dan zwart i.p.v. rood als verwijder-hint
 const removeHover = computed(() => hovered.value > 0 && hovered.value === props.act.score)
 
+// gevuld hartje (♥) o.b.v. hover-preview of de echte score
+function filled(n: number) {
+  return n <= (hovered.value || props.act.score || 0)
+}
+
+// in de verwijder-hover morphen de gevulde hartjes naar een X (klik = weghalen)
+function showX(n: number) {
+  return removeHover.value && n <= (props.act.score || 0)
+}
+
+const xSize = computed(() => props.size === 'lg' ? 'size-6' : 'size-4')
+
 const showEditorAlways = computed(() => props.editor && canEdit)
 
 // reputatie naast de hartjes: '♥♥ / ✦✦✦'; zonder hartjes alleen de sterren
@@ -68,13 +80,26 @@ const liveRepSuffix = computed(() => {
         <button
           v-for="n in 3"
           :key="n"
-          class="cursor-pointer px-px leading-none"
-          :class="[heartSize, n <= (hovered || act.score || 0) ? (removeHover ? 'text-black' : 'text-red-600') : 'text-black']"
+          class="relative cursor-pointer px-px leading-none"
+          :class="heartSize"
           :title="act.score === n ? 'Klik nogmaals: hartjes weg' : HEART_LABELS[n]"
           @mouseenter="hovered = n"
           @click="clickHeart(n)"
         >
-          {{ n <= (hovered || act.score || 0) ? '♥' : '♡' }}
+          <!-- hartje en X gestapeld; in de verwijder-hover draait het hartje weg
+               en de X erin, net als de tijdreis-knop -->
+          <span
+            class="block transition-all duration-200 ease-out"
+            :class="[
+              filled(n) ? (removeHover ? 'text-black' : 'text-red-600') : 'text-black',
+              showX(n) ? 'rotate-90 scale-50 opacity-0' : 'rotate-0 scale-100 opacity-100'
+            ]"
+          >{{ filled(n) ? '♥' : '♡' }}</span>
+          <span
+            class="absolute inset-0 flex items-center justify-center text-black transition-all duration-200 ease-out"
+            :class="showX(n) ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-50 opacity-0'"
+            aria-hidden="true"
+          ><UIcon name="i-lucide-x" :class="xSize" /></span>
         </button>
       </span>
     </span>
