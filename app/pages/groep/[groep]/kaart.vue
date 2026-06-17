@@ -94,6 +94,18 @@ function onTouchMove(e: TouchEvent) {
   }
 }
 
+// Bij het optillen van een vinger verandert het aantal touches. Her-ijk de
+// referentiepunten naar de vinger(s) die blijven, anders berekent de eerstvolgende
+// beweging een delta t.o.v. een verouderd punt en springt de afbeelding.
+function onTouchEnd(e: TouchEvent) {
+  if (e.touches.length === 1) {
+    lastSingle = { x: e.touches[0]!.clientX, y: e.touches[0]!.clientY }
+  } else if (e.touches.length === 2) {
+    lastDist = dist(e.touches[0]!, e.touches[1]!)
+    lastMid = midpoint(e.touches[0]!, e.touches[1]!)
+  }
+}
+
 function reset() {
   scale.value = MIN
   tx.value = 0
@@ -110,6 +122,7 @@ function reset() {
       :style="{ touchAction }"
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
     >
       <img
         src="/wildeweide-plattegrond.jpg"
