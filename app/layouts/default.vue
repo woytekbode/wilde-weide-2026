@@ -15,7 +15,8 @@ const nav = computed(() => {
     // { to: `${base}/tabel`, label: 'Tabel', icon: 'i-lucide-table' },
     { to: `${base}/acts`, label: 'Acts', icon: 'i-lucide-layout-grid' },
     { to: `${base}/sfeer`, label: 'Sfeer', icon: 'i-lucide-bubbles' },
-    { to: `${base}/stages`, label: 'Stages', icon: 'i-lucide-ship' }
+    { to: `${base}/stages`, label: 'Stages', icon: 'i-lucide-ship' },
+    { to: `${base}/kaart`, label: 'Kaart', icon: 'i-lucide-map' }
   ]
 })
 

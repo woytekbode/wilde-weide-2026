@@ -30,8 +30,8 @@ const { frozen, toggle: toggleFakeNow } = useFakeNow()
         type="button"
         class="ww-nav-btn ml-auto px-3!"
         :class="{ 'ww-nav-btn-active': frozen }"
-        aria-label="Neptijd: spring naar een willekeurig moment in het weekend"
-        title="Neptijd: spring naar een willekeurig moment in het weekend"
+        aria-label="Tijdreizen: spring naar een willekeurig moment in het weekend"
+        title="Tijdreizen: spring naar een willekeurig moment in het weekend"
         @click="toggleFakeNow"
       >
         <UIcon name="i-lucide-clock-fading" class="block size-5" />

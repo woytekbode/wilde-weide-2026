@@ -53,7 +53,7 @@ if (import.meta.client) {
                 >Kas</span>
               </div>
               <p class="text-sm">
-                <span class="font-bold">Verberg stage</span> een simpele tik is genoeg.
+                <span class="font-bold">Verberg stage</span> tik op de stage naam en hij verdwijnt.
               </p>
             </div>
 
@@ -94,6 +94,16 @@ if (import.meta.client) {
               </div>
               <p class="text-sm">
                 <span class="font-bold">Conflict</span> aii, jouw favorieten hebben hetzelfde timeslot.
+              </p>
+            </div>
+
+            <!-- tijdreizen -->
+            <div class="flex items-center gap-4 py-3">
+              <div class="flex w-24 shrink-0 justify-center">
+                <UIcon name="i-lucide-clock-fading" class="block size-6" />
+              </div>
+              <p class="text-sm">
+                <span class="font-bold">Tijdreizen</span> geen geduld tot het weekend? Doe net alsof je er al bent, zet een liedje op en doe een dansje.
               </p>
             </div>
           </div>

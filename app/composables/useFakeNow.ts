@@ -2,7 +2,7 @@ import { festivalDayKeyFor } from '~/data/display'
 import type { DayKey } from '~/types/program'
 
 /**
- * Neptijd-knop (klok in de header). Zet de gedeelde klok op een willekeurig
+ * Tijdreizen-knop (klok in de header). Zet de gedeelde klok op een willekeurig
  * moment waarop er ook echt acts spelen — uniform getrokken uit de vereniging
  * van alle act-vensters, dus nooit in een dode nacht-gat (geen zaterdag 04:00) —
  * en bevriest hem daar, zodat je de weekend-weergave (nu/straks/geweest,
