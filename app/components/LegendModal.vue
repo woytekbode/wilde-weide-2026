@@ -97,6 +97,16 @@ if (import.meta.client) {
               </p>
             </div>
           </div>
+
+          <p class="text-center text-sm text-black/60">
+            Vragen of opmerkingen? Ga naar het
+            <a
+              href="https://github.com/woytekbode/wilde-weide-2026"
+              target="_blank"
+              rel="noopener"
+              class="font-bold underline"
+            >project op GitHub</a>.
+          </p>
         </div>
       </div>
     </template>
