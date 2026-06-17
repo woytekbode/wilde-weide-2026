@@ -206,14 +206,24 @@ function placeTent(clientX: number, clientY: number) {
           draggable="false"
           loading="lazy"
         >
+        <!-- marker als SVG met breedte in % van de kaart, zodat de verhouding
+             marker:kaart op elk schermformaat gelijk blijft (clamp houdt 'm op
+             een klein scherm leesbaar). Schaalt daarnaast mee met de zoom omdat
+             hij in de getransformeerde wrapper zit. -->
         <div
           v-if="tent"
-          class="pointer-events-none absolute"
-          :style="{ left: `${tent.fx * 100}%`, top: `${tent.fy * 100}%` }"
+          class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+          :style="{ left: `${tent.fx * 100}%`, top: `${tent.fy * 100}%`, width: 'clamp(16px, 4%, 50px)' }"
         >
-          <div class="flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-black bg-lila-500 shadow-md">
-            <UIcon name="i-lucide-tent" class="size-7 text-black" />
-          </div>
+          <svg viewBox="0 0 32 32" class="block w-full drop-shadow-sm">
+            <circle cx="16" cy="16" r="14" fill="#a48dbe" stroke="#000" stroke-width="2" />
+            <g transform="translate(5.2 5.2) scale(0.9)" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.5 21 14 3" />
+              <path d="M20.5 21 10 3" />
+              <path d="M15.5 21 12 15l-3.5 6" />
+              <path d="M2 21h20" />
+            </g>
+          </svg>
         </div>
       </div>
 
