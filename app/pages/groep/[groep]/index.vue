@@ -28,13 +28,28 @@ const { frozen, toggle: toggleFakeNow } = useFakeNow()
            springt naar een willekeurig moment in het weekend en bevriest de klok -->
       <button
         type="button"
-        class="ww-nav-btn ml-auto px-3!"
+        class="ww-nav-btn group ml-auto px-3!"
         :class="{ 'ww-nav-btn-active': frozen }"
-        aria-label="Tijdreizen: spring naar een willekeurig moment in het weekend"
-        title="Tijdreizen: spring naar een willekeurig moment in het weekend"
+        :aria-label="frozen ? 'Tijdreizen stoppen' : 'Tijdreizen: spring naar een willekeurig moment in het weekend'"
+        :title="frozen ? 'Tijdreizen stoppen' : 'Tijdreizen: spring naar een willekeurig moment in het weekend'"
         @click="toggleFakeNow"
       >
-        <UIcon name="i-lucide-clock-fading" class="block size-5" />
+        <!-- Alleen als tijdreizen AAN staat animeert de klok bij hover naar een X
+             (klik = stoppen). Staat hij UIT, dan blijft het de klok; de knop zelf
+             vult dan alleen via de normale ww-nav-btn hover. Beide iconen liggen
+             gestapeld en draaien/faden in elkaar over. -->
+        <span class="relative block size-5">
+          <UIcon
+            name="i-lucide-clock-fading"
+            class="absolute inset-0 size-5 transition-all duration-200 ease-out"
+            :class="frozen ? 'group-hover:rotate-90 group-hover:scale-50 group-hover:opacity-0' : ''"
+          />
+          <UIcon
+            name="i-lucide-x"
+            class="absolute inset-0 size-5 -rotate-90 scale-50 opacity-0 transition-all duration-200 ease-out"
+            :class="frozen ? 'group-hover:rotate-0 group-hover:scale-100 group-hover:opacity-100' : ''"
+          />
+        </span>
       </button>
 
       <!-- heropent de uitleg-/legenda-modal -->
