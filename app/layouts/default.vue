@@ -37,7 +37,10 @@ const ACCENT_VARS: Record<string, string> = {
 const pageColor = computed<string>(() => {
   if (route.name === 'groep-groep') {
     const meta = DAY_META.find(d => d.key === timetableDay.value)
-    return meta?.key === 'zaterdag' ? 'oker' : meta?.key === 'zondag' ? 'veld' : 'lila'
+    if (meta?.key === 'zaterdag') return 'oker'
+    // donderdag (camping) deelt nu de groene veld-kleur met zondag
+    if (meta?.key === 'zondag' || meta?.key === 'donderdag') return 'veld'
+    return 'lila'
   }
   return (route.meta.wwBg as string) ?? 'lila'
 })

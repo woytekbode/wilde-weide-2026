@@ -16,15 +16,15 @@ export interface DayMeta {
 
 export const DAY_META: DayMeta[] = [
   {
-    // campingdag vóór het festival; deelt de lila paginakleur met vrijdag
+    // campingdag vóór het festival; deelt nu de groene veld-kleur met zondag
     key: 'donderdag',
     label: 'Donderdag 2 juli',
     shortLabel: 'do',
     date: '2026-07-02',
-    bg: 'bg-lila-500',
-    accent: 'bg-lila-500',
-    accentSoft: 'bg-lila-200',
-    accentVar: 'var(--color-lila-500)'
+    bg: 'bg-veld-500',
+    accent: 'bg-veld-500',
+    accentSoft: 'bg-veld-200',
+    accentVar: 'var(--color-veld-500)'
   },
   {
     key: 'vrijdag',

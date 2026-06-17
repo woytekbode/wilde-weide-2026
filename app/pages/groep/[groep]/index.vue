@@ -5,6 +5,7 @@ import type { DayKey } from '~/types/program'
 // tijdens het weekend selecteert app/plugins/now.ts automatisch vandaag
 const timetableDay = useState<DayKey>('timetable-day', () => 'vrijdag')
 const { openLegend } = useLegend()
+const { frozen, toggle: toggleFakeNow } = useFakeNow()
 </script>
 
 <template>
@@ -24,10 +25,22 @@ const { openLegend } = useLegend()
       </button>
 
       <!-- zelfde stijl als de dagknoppen, maar rechts uitgelijnd (ml-auto);
-           heropent de uitleg-/legenda-modal -->
+           springt naar een willekeurig moment in het weekend en bevriest de klok -->
       <button
         type="button"
-        class="ww-nav-btn ml-auto"
+        class="ww-nav-btn ml-auto px-3!"
+        :class="{ 'ww-nav-btn-active': frozen }"
+        aria-label="Neptijd: spring naar een willekeurig moment in het weekend"
+        title="Neptijd: spring naar een willekeurig moment in het weekend"
+        @click="toggleFakeNow"
+      >
+        <UIcon name="i-lucide-clock-fading" class="block size-5" />
+      </button>
+
+      <!-- heropent de uitleg-/legenda-modal -->
+      <button
+        type="button"
+        class="ww-nav-btn"
         aria-label="Uitleg"
         title="Uitleg"
         @click="openLegend"

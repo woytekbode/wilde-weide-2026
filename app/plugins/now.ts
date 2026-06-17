@@ -13,6 +13,9 @@ import type { DayKey } from '~/types/program'
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const now = useNow()
+  // bevroren klok: gezet door ?fakenow of de klok-knop (useFakeNow). Zolang dit
+  // aanstaat overschrijft de minuut-tik de klok niet.
+  const frozen = useState<boolean>('now-frozen', () => false)
   const timetableDay = useState<DayKey>('timetable-day', () => 'vrijdag')
   // route hier vastpakken: in de app:mounted-callback mag geen composable, en
   // window.location.search is tijdens het opstarten even leeg (replaceState-
@@ -33,7 +36,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   if (import.meta.server) {
     const fake = parseFake(useRequestURL().searchParams.get('fakenow'))
-    if (fake !== null) apply(fake)
+    if (fake !== null) {
+      frozen.value = true
+      apply(fake)
+    }
     return
   }
 
@@ -41,17 +47,16 @@ export default defineNuxtPlugin((nuxtApp) => {
     // echte klok starten; de route-query reactief volgen, want tijdens het
     // opstarten wisselt de router even naar de kale URL en pas daarna terug
     // naar de volledige URL mét query — een eenmalige read mist die race
-    let interval: ReturnType<typeof setInterval> | undefined
     apply(Date.now())
-    interval = setInterval(() => {
-      now.value = Date.now()
+    setInterval(() => {
+      // bevroren klok (fakenow-query of de klok-knop) niet overschrijven
+      if (!frozen.value) now.value = Date.now()
     }, 60_000)
 
     watch(() => route.query.fakenow, (value) => {
       const fake = parseFake(value)
       if (fake !== null) {
-        clearInterval(interval)
-        interval = undefined
+        frozen.value = true
         apply(fake)
       }
     }, { immediate: true })
