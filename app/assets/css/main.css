@@ -218,3 +218,10 @@ h1, h2, h3, h4 {
   background-color: var(--ww-accent, var(--color-lila-500));
   @apply text-black;
 }
+
+/* Tent-cursor voor de plattegrond: een mini-versie van de marker (lila cirkel
+   met zwart tent-icoon), zodat op desktop meteen duidelijk is dat je een tent
+   kunt plaatsen. Hotspot in het midden van de cirkel. */
+.cursor-tent {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><g opacity='0.7'><circle cx='24' cy='24' r='21' fill='%23a48dbe' stroke='%23000' stroke-width='3'/><g transform='translate(10 10) scale(1.1667)' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 21 14 3'/><path d='M20.5 21 10 3'/><path d='M15.5 21 12 15l-3.5 6'/><path d='M2 21h20'/></g></g></svg>") 24 24, copy;
+}

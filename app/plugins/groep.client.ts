@@ -1,5 +1,5 @@
 import type { Act } from '~/types/program'
-import type { GroepScoreMap, GroepSfeerMap } from '#shared/groep'
+import type { GroepScoreMap, GroepSfeerMap, GroepTent } from '#shared/groep'
 import { buildActs } from '~/composables/useActs'
 import { buildSfeerItems } from '~/composables/useSfeer'
 
@@ -13,6 +13,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const route = useRoute()
   const { acts } = useActs()
   const { items: sfeerItems } = useSfeer()
+  const { tent: tentPos } = useTent()
   const { groepNaam, rememberGroep, forgetGroep } = useGroep()
   const detailsAct = useState<Act | null>('act-details', () => null)
   const detailsOpen = useState<boolean>('act-details-open', () => false)
@@ -29,6 +30,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     detailsOpen.value = false
     acts.value = buildActs()
     sfeerItems.value = buildSfeerItems()
+    tentPos.value = null
     groepNaam.value = ''
 
     let info: { slug: string, naam: string }
@@ -52,9 +54,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     rememberGroep(slug, info.naam)
 
     try {
-      const [scores, likes] = await Promise.all([
+      const [scores, likes, tent] = await Promise.all([
         $fetch<GroepScoreMap>(`/api/groep/${slug}/scores`),
-        $fetch<GroepSfeerMap>(`/api/groep/${slug}/sfeer`)
+        $fetch<GroepSfeerMap>(`/api/groep/${slug}/sfeer`),
+        $fetch<GroepTent | null>(`/api/groep/${slug}/tent`)
       ])
       if (token !== laadToken) return
 
@@ -73,6 +76,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       for (const item of sfeerItems.value) {
         item.liked = item.id in likes
       }
+      tentPos.value = tent ? { fx: tent.fx, fy: tent.fy } : null
     } catch (err) {
       if (token !== laadToken) return
       console.warn('groepsdata laden mislukt', err)

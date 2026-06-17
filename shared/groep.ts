@@ -63,10 +63,21 @@ export interface GroepScoreEntry {
 export type GroepScoreMap = Record<string, GroepScoreEntry>
 export type GroepSfeerMap = Record<string, { t: number }>
 
+/** gedeelde tentlocatie van een groep, als fractie (0..1) van de plattegrond */
+export interface GroepTent {
+  fx: number
+  fy: number
+  t: number
+}
+
 export function scoresKey(slug: string): string {
   return `scores:${slug}`
 }
 
 export function sfeerKey(slug: string): string {
   return `sfeer:${slug}`
+}
+
+export function tentKey(slug: string): string {
+  return `tent:${slug}`
 }

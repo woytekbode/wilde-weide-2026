@@ -4,6 +4,7 @@
  *   groepen        → { [slug]: { naam, t } }            (register)
  *   scores:<slug>  → { [actId]: { score, status, t } }
  *   sfeer:<slug>   → { [id]: { t } }                    (aanwezig = like)
+ *   tent:<slug>    → { fx, fy, t }                      (gedeelde tentlocatie)
  *
  * Read-modify-write op één blob is last-write-wins; bij gelijktijdige kliks
  * van twee telefoons kan er in theorie één verloren gaan — voor een
@@ -11,7 +12,7 @@
  */
 
 import type { AdminGroep, GroepenRegister, GroepScoreMap, GroepSfeerMap } from '../shared/groep'
-import { GROEPEN_KEY, groepSlug, isAdminGroep, isGeldigeGroepSlug, scoresKey, sfeerKey } from '../shared/groep'
+import { GROEPEN_KEY, groepSlug, isAdminGroep, isGeldigeGroepSlug, scoresKey, sfeerKey, tentKey } from '../shared/groep'
 
 interface Env {
   SCORES: {
@@ -110,6 +111,7 @@ export default {
       }
       await env.SCORES.delete(scoresKey(slug))
       await env.SCORES.delete(sfeerKey(slug))
+      await env.SCORES.delete(tentKey(slug))
       delete groepen[slug]
       await env.SCORES.put(GROEPEN_KEY, JSON.stringify(groepen))
       return json({ ok: true })
@@ -146,7 +148,7 @@ export default {
       return json({ slug, naam, bestond: false })
     }
 
-    const groepMatch = url.pathname.match(/^\/api\/groep\/([^/]+)(?:\/(scores|sfeer))?$/)
+    const groepMatch = url.pathname.match(/^\/api\/groep\/([^/]+)(?:\/(scores|sfeer|tent))?$/)
     if (groepMatch) {
       const slug = groepMatch[1]!
       const sub = groepMatch[2]
@@ -166,10 +168,11 @@ export default {
         return json({ slug, naam: groep.naam })
       }
 
-      const key = sub === 'scores' ? scoresKey(slug) : sfeerKey(slug)
+      const key = sub === 'scores' ? scoresKey(slug) : sub === 'sfeer' ? sfeerKey(slug) : tentKey(slug)
 
       if (request.method === 'GET') {
-        return json(await env.SCORES.get(key, 'json') ?? {})
+        // tent is één blob (of nog niet gezet → null); scores/sfeer zijn maps
+        return json(await env.SCORES.get(key, 'json') ?? (sub === 'tent' ? null : {}))
       }
       if (request.method !== 'POST') {
         return json({ error: 'method not allowed' }, 405)
@@ -179,6 +182,22 @@ export default {
       if (!body) {
         return json({ error: 'ongeldige JSON' }, 400)
       }
+
+      // tent: één gedeelde coördinaat (geen id). clear:true haalt 'm weg.
+      if (sub === 'tent') {
+        if (body.clear === true) {
+          await env.SCORES.delete(key)
+          return json(null)
+        }
+        const { fx, fy } = body
+        if (typeof fx !== 'number' || typeof fy !== 'number' || fx < 0 || fx > 1 || fy < 0 || fy > 1) {
+          return json({ error: 'fx en fy moeten tussen 0 en 1 liggen' }, 400)
+        }
+        const tent = { fx, fy, t: Date.now() }
+        await env.SCORES.put(key, JSON.stringify(tent))
+        return json(tent)
+      }
+
       const { id } = body
       if (typeof id !== 'string' || !id) {
         return json({ error: 'id ontbreekt' }, 400)
