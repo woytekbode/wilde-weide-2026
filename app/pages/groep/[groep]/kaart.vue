@@ -183,6 +183,11 @@ function placeTent(clientX: number, clientY: number) {
 
 <template>
   <div class="space-y-6">
+    <!-- intro -->
+    <section class="ww-card p-4">
+      <p class="text-sm font-bold">Waar werpen jullie je tentjes op?</p>
+    </section>
+
     <!-- plattegrond: knijp met twee vingers om te zoomen, tik om je tent te plaatsen -->
     <section
       ref="card"
