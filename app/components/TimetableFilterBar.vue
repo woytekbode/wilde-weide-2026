@@ -36,7 +36,7 @@ const dayHiddenStages = computed(() => {
          score-groep staat, bij wrappen op telefoon geen inspring zodat het
          uitlijnt met 'score:' -->
     <div v-if="dayHiddenStages.length > 0" class="flex flex-wrap items-center gap-2">
-      <span class="font-bold sm:ml-3">podium:</span>
+      <span class="font-bold sm:ml-3">podia:</span>
       <button
         v-for="stage in dayHiddenStages"
         :key="stage"

@@ -57,7 +57,7 @@ const { frozen, toggle: toggleFakeNow } = useFakeNow()
         type="button"
         class="ww-nav-btn"
         aria-label="Uitleg"
-        title="Uitleg"
+        title="Snap je er niks van?"
         @click="openLegend"
       >?</button>
     </div>
