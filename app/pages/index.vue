@@ -87,7 +87,7 @@ async function kopieerLink() {
     </div>
 
     <div v-else class="ww-card space-y-4 p-5">
-      <h2 class="font-display text-3xl font-black leading-tight">{{ gemaakt.naam }}, wat een naam! 🐼</h2>
+      <h2 class="font-display text-3xl font-black leading-tight">🌿 Welkom, {{ gemaakt.naam }}! 🌿</h2>
       <p class="text-sm font-bold">
         Deel deze link met je vrienden, of vage kennissen.
       </p>
