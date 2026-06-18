@@ -31,16 +31,6 @@ export function useFakeNow() {
    * gaten tussen blokken (de nachten) overgeslagen worden.
    */
   function activateRandom() {
-    // --- TEMP (reel): vaste tijd i.p.v. willekeurig voor een screen recording.
-    // Zet REEL op false (of verwijder dit blok) voor het willekeurige moment. ---
-    const REEL: boolean = true
-    if (REEL) {
-      frozen.value = true
-      applyAt(new Date('2026-07-04T14:45:00').getTime())
-      return
-    }
-    // --- EINDE TEMP ---
-
     const sorted = acts.value
       .map(a => [new Date(a.start).getTime(), new Date(a.end).getTime()] as const)
       .sort((x, y) => x[0] - y[0])

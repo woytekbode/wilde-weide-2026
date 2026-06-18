@@ -53,14 +53,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (!frozen.value) now.value = Date.now()
     }, 60_000)
 
-    // --- TEMP (reel): versnelde klok voor een screen recording, 1 uur = 10s
-    // (360x). Laat de bevroren klok lopen i.p.v. stilstaan. Verwijder dit blok
-    // om terug te keren naar de normale stilstaande fakenow-klok. ---
-    setInterval(() => {
-      if (frozen.value && now.value !== null) now.value += 36_000 // +36 sim-sec per 100ms
-    }, 100)
-    // --- EINDE TEMP ---
-
     watch(() => route.query.fakenow, (value) => {
       const fake = parseFake(value)
       if (fake !== null) {
