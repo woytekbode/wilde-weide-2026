@@ -30,6 +30,17 @@ function clickHeart(n: number) {
   setScore(props.act, props.act.score === n ? 0 : n)
 }
 
+// hover-preview/X-morph alleen voor een echte muis: op touch vuurt pointerenter
+// óók (type 'touch') maar pointerleave pas bij de volgende tik elders, waardoor
+// 'hovered' blijft plakken. Op touch laten we 'hovered' dus op 0 — tikken zet/
+// wist de score via clickHeart, zonder sticky preview.
+function enterHeart(e: PointerEvent, n: number) {
+  if (e.pointerType === 'mouse') hovered.value = n
+}
+function leaveHearts(e: PointerEvent) {
+  if (e.pointerType === 'mouse') hovered.value = 0
+}
+
 // hover je precies het hartje dat gelijk is aan de huidige score, dan wist een
 // klik de score; toon de gevulde hartjes dan zwart i.p.v. rood als verwijder-hint
 const removeHover = computed(() => hovered.value > 0 && hovered.value === props.act.score)
@@ -75,7 +86,7 @@ const liveRepSuffix = computed(() => {
         v-if="canEdit"
         class="items-center"
         :class="showEditorAlways ? 'inline-flex' : 'hidden group-hover/hearts:inline-flex'"
-        @mouseleave="hovered = 0"
+        @pointerleave="leaveHearts"
       >
         <button
           v-for="n in 3"
@@ -83,7 +94,7 @@ const liveRepSuffix = computed(() => {
           class="relative cursor-pointer px-px leading-none"
           :class="heartSize"
           :title="act.score === n ? 'Klik nogmaals: hartjes weg' : HEART_LABELS[n]"
-          @mouseenter="hovered = n"
+          @pointerenter="enterHeart($event, n)"
           @click="clickHeart(n)"
         >
           <!-- hartje en X gestapeld; in de verwijder-hover draait het hartje weg

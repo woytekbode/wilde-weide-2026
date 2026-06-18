@@ -128,15 +128,9 @@ h1, h2, h3, h4 {
 .ww-btn {
   @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-white px-4 py-1.5 font-sans font-bold text-black transition-colors duration-200;
 }
-.ww-btn:hover {
-  @apply bg-black text-white;
-}
 
 .ww-btn-solid {
   @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-black px-4 py-1.5 font-sans font-bold text-white transition-colors duration-200;
-}
-.ww-btn-solid:hover {
-  @apply bg-white text-black;
 }
 
 /* ronde icoonknop rechts in een ww-btn-solid: kleuren tegengesteld aan de knop
@@ -144,20 +138,35 @@ h1, h2, h3, h4 {
 .ww-btn-circle {
   @apply flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-black transition-colors duration-200;
 }
-.ww-btn-solid:hover .ww-btn-circle {
-  @apply bg-black text-white;
-}
 
 /* Navigatie (dagen + hoofdmenu): alleen outline, actief = zwart gevuld met
    tekst in de paginakleur */
 .ww-nav-btn {
   @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-transparent px-4 py-1.5 font-sans font-bold text-black transition-colors duration-200;
 }
-.ww-nav-btn:hover,
+/* actieve toestand altijd gevuld (ook zonder hover-capabele input) */
 .ww-nav-btn-active,
 .ww-nav-btn-active:hover {
   @apply bg-black;
   color: var(--ww-accent, var(--color-lila-500));
+}
+
+/* Hover-inversies alleen op apparaten met een echte hover (muis): op touch
+   blijft een :hover anders 'plakken' na een tik tot je ergens anders tikt. */
+@media (hover: hover) {
+  .ww-btn:hover {
+    @apply bg-black text-white;
+  }
+  .ww-btn-solid:hover {
+    @apply bg-white text-black;
+  }
+  .ww-btn-solid:hover .ww-btn-circle {
+    @apply bg-black text-white;
+  }
+  .ww-nav-btn:hover {
+    @apply bg-black;
+    color: var(--ww-accent, var(--color-lila-500));
+  }
 }
 
 /* Blokkenschema, stage verbergen/tonen: tegels van de stage klappen naar hun
