@@ -7,7 +7,7 @@ const { token, hydrate, adminFetch } = useAdmin()
 const toast = useToast()
 
 const groepen = ref<AdminGroep[]>([])
-const totaal = ref({ groepen: 0, likes: 0, actief: 0 })
+const totaal = ref({ groepen: 0, likes: 0, active: 0 })
 const bezig = ref(true)
 const fout = ref('')
 
@@ -57,7 +57,7 @@ async function verwijder(groep: AdminGroep) {
     totaal.value = {
       groepen: totaal.value.groepen - 1,
       likes: totaal.value.likes - groep.likes,
-      actief: totaal.value.actief - (groep.actief ? 1 : 0)
+      active: totaal.value.active - (groep.active ? 1 : 0)
     }
     toast.add({ title: `${groep.naam} verwijderd` })
   } catch (err) {
@@ -81,8 +81,8 @@ async function verwijder(groep: AdminGroep) {
         <!-- actief-stip: groen als er een sessie binnen 7 dagen gezien is -->
         <span
           class="mt-1.5 size-2.5 shrink-0 rounded-full border border-black"
-          :class="groep.actief ? 'bg-veld-500' : 'bg-transparent'"
-          :title="groep.actief ? 'actief (laatste 7 dagen)' : 'inactief'"
+          :class="groep.active ? 'bg-veld-500' : 'bg-transparent'"
+          :title="groep.active ? 'actief (laatste 7 dagen)' : 'inactief'"
         />
 
         <div class="min-w-0 flex-1">
@@ -104,13 +104,13 @@ async function verwijder(groep: AdminGroep) {
               <UIcon name="i-lucide-clock" class="size-3.5" />{{ geleden(groep.lastActive) }}
             </span>
             <span class="flex items-center gap-1" title="unieke sessies (≈ grootte)">
-              <UIcon name="i-lucide-users" class="size-3.5" />{{ groep.sessies }}
+              <UIcon name="i-lucide-users" class="size-3.5" />{{ groep.sessions }}
             </span>
             <span class="flex items-center gap-1" title="hartjes">
               <UIcon name="i-lucide-heart" class="size-3.5" />{{ groep.likes }}
             </span>
-            <span v-if="groep.suggesties" class="flex items-center gap-1" title="tips">
-              <UIcon name="i-lucide-lightbulb" class="size-3.5" />{{ groep.suggesties }}
+            <span v-if="groep.suggestions" class="flex items-center gap-1" title="tips">
+              <UIcon name="i-lucide-lightbulb" class="size-3.5" />{{ groep.suggestions }}
             </span>
             <span v-if="groep.sfeer" class="flex items-center gap-1" title="sfeer-likes">
               <UIcon name="i-lucide-bubbles" class="size-3.5" />{{ groep.sfeer }}

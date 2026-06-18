@@ -1,5 +1,5 @@
 import type { AdminGroep, GroepenRegister, GroepScoreMap, GroepSfeerMap, GroepStats, GroepTent } from '#shared/groep'
-import { GROEPEN_KEY, isAdminGroep, scoresKey, sfeerKey, statsKey, tentKey, vatStatsSamen } from '#shared/groep'
+import { GROEPEN_KEY, isAdminGroep, scoresKey, sfeerKey, statsKey, tentKey, summarizeStats } from '#shared/groep'
 
 /** Dev-spiegel van GET /api/admin/groepen in worker/index.ts */
 export default defineEventHandler(async (event) => {
@@ -23,21 +23,21 @@ export default defineEventHandler(async (event) => {
     ])
     const scoreLijst = scores ? Object.values(scores) : []
     const likes = scoreLijst.filter(s => s.status === 'scored').length
-    const samenvatting = vatStatsSamen(stats)
+    const samenvatting = summarizeStats(stats)
     likesTotaal += likes
-    if (samenvatting.actief) actiefTotaal++
+    if (samenvatting.active) actiefTotaal++
     rijen.push({
       slug,
       naam: info.naam,
       t: info.t,
       admin: isAdminGroep(info),
       likes,
-      suggesties: scoreLijst.filter(s => s.status === 'suggested').length,
+      suggestions: scoreLijst.filter(s => s.status === 'suggested').length,
       sfeer: sfeer ? Object.keys(sfeer).length : 0,
       tent: tent != null,
       ...samenvatting
     })
   }
   rijen.sort((a, b) => b.t - a.t)
-  return { groepen: rijen, totaal: { groepen: rijen.length, likes: likesTotaal, actief: actiefTotaal } }
+  return { groepen: rijen, totaal: { groepen: rijen.length, likes: likesTotaal, active: actiefTotaal } }
 })

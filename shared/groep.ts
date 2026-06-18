@@ -2,6 +2,11 @@
  * Gedeelde groep-logica voor de app, de dev-server (Nitro) en de worker.
  * Elke vriendengroep heeft een slug; alle groepsdata leeft in KV onder
  * uniforme keys: scores:<slug>, sfeer:<slug> en het register 'groepen'.
+ *
+ * Naamgeving: Engels in de backend/stores (KV-velden, API, deze types),
+ * Nederlands in de frontend/UI (labels, teksten). Een paar legacy-velden
+ * blijven bewust zoals ze zijn omdat ze al in KV staan (o.a. `t` = timestamp,
+ * `naam`, `sfeer`): hernoemen zou een datamigratie vergen.
  */
 
 export const GROEP_LS_KEY = 'ww-groep'
@@ -48,17 +53,17 @@ export interface AdminGroep {
   /** echte hartjes (status 'scored') */
   likes: number
   /** tips (status 'suggested') */
-  suggesties: number
+  suggestions: number
   /** sfeermaker-likes */
   sfeer: number
   /** tent geplaatst op de plattegrond */
   tent: boolean
   /** unieke sessies ≈ groepsgrootte (ruw) */
-  sessies: number
+  sessions: number
   /** laatste activiteit (ms), null als er nog geen stats zijn */
   lastActive: number | null
-  /** een sessie gezien binnen ACTIEF_VENSTER_MS */
-  actief: boolean
+  /** een sessie gezien binnen ACTIVE_WINDOW_MS */
+  active: boolean
   /** totaal aantal bezoek-pings */
   visits: number
 }
@@ -66,11 +71,11 @@ export interface AdminGroep {
 /** antwoord van GET /api/admin/groepen */
 export interface AdminGroepenResponse {
   groepen: AdminGroep[]
-  totaal: { groepen: number, likes: number, actief: number }
+  totaal: { groepen: number, likes: number, active: number }
 }
 
 /** een groep geldt als 'actief' als er een sessie binnen dit venster gezien is */
-export const ACTIEF_VENSTER_MS = 7 * 24 * 60 * 60 * 1000
+export const ACTIVE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
 
 export interface GroepScoreEntry {
   /** 0-3 bij status 'scored', null bij 'suggested' */
@@ -90,7 +95,7 @@ export interface GroepTent {
 }
 
 /**
- * Geaggregeerde, niet-persoonlijke activiteitsstats per groep. `sessies` mapt
+ * Geaggregeerde, niet-persoonlijke activiteitsstats per groep. `sessions` mapt
  * een willekeurige (pseudonieme) sessie-id naar het laatst-gezien-moment; puur
  * om de groepsgrootte ruw te schatten — nooit gekoppeld over groepen heen.
  */
@@ -100,7 +105,7 @@ export interface GroepStats {
   /** totaal aantal bezoek-pings */
   visits: number
   /** sid → laatst gezien (ms) */
-  sessies: Record<string, number>
+  sessions: Record<string, number>
 }
 
 export function scoresKey(slug: string): string {
@@ -120,13 +125,13 @@ export function statsKey(slug: string): string {
 }
 
 /** vat een stats-blob (of het ontbreken ervan) samen tot de admin-velden */
-export function vatStatsSamen(stats: GroepStats | null, now: number = Date.now()) {
-  const sessieTijden = stats ? Object.values(stats.sessies) : []
+export function summarizeStats(stats: GroepStats | null, now: number = Date.now()) {
+  const seenTimes = stats?.sessions ? Object.values(stats.sessions) : []
   return {
-    sessies: sessieTijden.length,
+    sessions: seenTimes.length,
     lastActive: stats?.lastActive ?? null,
     visits: stats?.visits ?? 0,
-    actief: sessieTijden.some(t => now - t < ACTIEF_VENSTER_MS)
+    active: seenTimes.some(t => now - t < ACTIVE_WINDOW_MS)
   }
 }
 

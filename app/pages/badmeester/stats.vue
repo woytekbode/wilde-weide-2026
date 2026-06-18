@@ -5,7 +5,7 @@ definePageMeta({ layout: 'admin' })
 
 const { token, hydrate, adminFetch } = useAdmin()
 
-const totaal = ref({ groepen: 0, likes: 0, actief: 0 })
+const totaal = ref({ groepen: 0, likes: 0, active: 0 })
 const bezig = ref(true)
 const fout = ref('')
 
@@ -40,7 +40,7 @@ onMounted(async () => {
         <div class="text-sm font-bold">groepen</div>
       </div>
       <div>
-        <div class="font-display text-4xl font-black tabular-nums">{{ totaal.actief }}</div>
+        <div class="font-display text-4xl font-black tabular-nums">{{ totaal.active }}</div>
         <div class="text-sm font-bold">actief</div>
       </div>
       <div>

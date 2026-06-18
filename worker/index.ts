@@ -12,7 +12,7 @@
  */
 
 import type { AdminGroep, GroepenRegister, GroepScoreMap, GroepSfeerMap, GroepStats, GroepTent } from '../shared/groep'
-import { GROEPEN_KEY, groepSlug, isAdminGroep, isGeldigeGroepSlug, isGeldigeSid, scoresKey, sfeerKey, statsKey, tentKey, vatStatsSamen } from '../shared/groep'
+import { GROEPEN_KEY, groepSlug, isAdminGroep, isGeldigeGroepSlug, isGeldigeSid, scoresKey, sfeerKey, statsKey, tentKey, summarizeStats } from '../shared/groep'
 
 interface Env {
   SCORES: {
@@ -89,23 +89,23 @@ export default {
           env.SCORES.get<GroepStats>(statsKey(slug), 'json')
         ])
         const likes = telStatus(scores, 'scored')
-        const samenvatting = vatStatsSamen(stats)
+        const samenvatting = summarizeStats(stats)
         likesTotaal += likes
-        if (samenvatting.actief) actiefTotaal++
+        if (samenvatting.active) actiefTotaal++
         rijen.push({
           slug,
           naam: info.naam,
           t: info.t,
           admin: isAdminGroep(info),
           likes,
-          suggesties: telStatus(scores, 'suggested'),
+          suggestions: telStatus(scores, 'suggested'),
           sfeer: sfeer ? Object.keys(sfeer).length : 0,
           tent: tent !== null,
           ...samenvatting
         })
       }
       rijen.sort((a, b) => b.t - a.t)
-      return json({ groepen: rijen, totaal: { groepen: rijen.length, likes: likesTotaal, actief: actiefTotaal } })
+      return json({ groepen: rijen, totaal: { groepen: rijen.length, likes: likesTotaal, active: actiefTotaal } })
     }
 
     const adminDel = url.pathname.match(/^\/api\/admin\/groep\/([^/]+)$/)
@@ -168,7 +168,7 @@ export default {
       return json({ slug, naam, bestond: false })
     }
 
-    const groepMatch = url.pathname.match(/^\/api\/groep\/([^/]+)(?:\/(scores|sfeer|tent|bezoek))?$/)
+    const groepMatch = url.pathname.match(/^\/api\/groep\/([^/]+)(?:\/(scores|sfeer|tent|visit))?$/)
     if (groepMatch) {
       const slug = groepMatch[1]!
       const sub = groepMatch[2]
@@ -192,10 +192,10 @@ export default {
         ? scoresKey(slug)
         : sub === 'sfeer' ? sfeerKey(slug) : sub === 'tent' ? tentKey(slug) : statsKey(slug)
 
-      // stats (bezoek) is alleen-schrijven: de pseudonieme sessie-map nooit
+      // stats (visit) is alleen-schrijven: de pseudonieme sessie-map nooit
       // publiek teruggeven; alleen het beheerpaneel ziet de samenvatting.
       if (request.method === 'GET') {
-        if (sub === 'bezoek') {
+        if (sub === 'visit') {
           return json({ error: 'method not allowed' }, 405)
         }
         // tent is één blob (of nog niet gezet → null); scores/sfeer zijn maps
@@ -210,16 +210,17 @@ export default {
         return json({ error: 'ongeldige JSON' }, 400)
       }
 
-      // bezoek: activiteits-ping (geen id, wel een pseudonieme sid). Werkt de
+      // visit: activiteits-ping (geen id, wel een pseudonieme sid). Werkt de
       // stats-blob bij: lastActive, een teller en de sessie-map (≈ grootte).
-      if (sub === 'bezoek') {
+      if (sub === 'visit') {
         const { sid } = body
         if (!isGeldigeSid(sid)) {
           return json({ error: 'sid ontbreekt' }, 400)
         }
         const now = Date.now()
-        const stats = await env.SCORES.get<GroepStats>(key, 'json') ?? { lastActive: now, visits: 0, sessies: {} }
-        stats.sessies[sid] = now
+        const stats = await env.SCORES.get<GroepStats>(key, 'json') ?? { lastActive: now, visits: 0, sessions: {} }
+        stats.sessions ??= {} // oudere blobs misten dit veld
+        stats.sessions[sid] = now
         stats.lastActive = now
         stats.visits = (stats.visits ?? 0) + 1
         await env.SCORES.put(key, JSON.stringify(stats))

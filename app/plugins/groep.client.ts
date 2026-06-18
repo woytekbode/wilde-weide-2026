@@ -54,9 +54,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     rememberGroep(slug, info.naam)
 
     // activiteits-ping (fire-and-forget, gethrottled): voedt de Badmeester-stats
-    if (!bezoekRecent(slug)) {
-      markBezoek(slug)
-      $fetch(`/api/groep/${slug}/bezoek`, { method: 'POST', body: { sid: sessieId() } })
+    if (!visitRecent(slug)) {
+      markVisit(slug)
+      $fetch(`/api/groep/${slug}/visit`, { method: 'POST', body: { sid: sessieId() } })
         .catch(() => { /* stats zijn niet kritisch */ })
     }
 
