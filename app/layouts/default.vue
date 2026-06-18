@@ -105,7 +105,7 @@ useHead({
         v-for="item in nav"
         :key="item.to"
         :to="item.to"
-        class="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1 text-[11px] font-bold"
+        class="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1 text-[11px] font-bold transition-transform motion-safe:active:scale-95"
         :style="route.path === item.to ? { backgroundColor: '#000', color: 'var(--ww-accent)' } : undefined"
       >
         <UIcon :name="item.icon" class="size-5" />

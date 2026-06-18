@@ -40,7 +40,7 @@ const dayHiddenStages = computed(() => {
       <button
         v-for="stage in dayHiddenStages"
         :key="stage"
-        class="cursor-pointer rounded-full border-[3px] border-black px-3 py-1 text-xs font-bold"
+        class="cursor-pointer rounded-full border-[3px] border-black px-3 py-1 text-xs font-bold transition-transform motion-safe:active:scale-95"
         :class="stageColor(stage)"
         :style="{ viewTransitionName: `stage-${slugify(stage)}`, viewTransitionClass: 'ww-chip' }"
         title="toon podium"

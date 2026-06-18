@@ -250,7 +250,7 @@ function placeTent(clientX: number, clientY: number) {
         <button
           v-else
           type="button"
-          class="flex size-12 cursor-pointer items-center justify-center rounded-full border-[3px] border-dotted border-black/50 bg-white/60 shadow-md"
+          class="flex size-12 cursor-pointer items-center justify-center rounded-full border-[3px] border-dotted border-black/50 bg-white/60 shadow-md transition-transform motion-safe:active:scale-95"
           aria-label="Tent terughalen"
           @click="clearTent()"
         >

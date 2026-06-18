@@ -73,7 +73,7 @@ async function verwijder(groep: AdminGroep) {
         </span>
         <button
           v-if="!groep.admin"
-          class="shrink-0 rounded-full border-2 border-black p-1.5 transition-colors hover:bg-black hover:text-white"
+          class="shrink-0 rounded-full border-2 border-black p-1.5 transition hover:bg-black hover:text-white motion-safe:active:scale-95"
           :aria-label="`${groep.naam} verwijderen`"
           @click="verwijder(groep)"
         >

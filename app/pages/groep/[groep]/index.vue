@@ -4,7 +4,7 @@ import type { DayKey } from '~/types/program'
 
 // tijdens het weekend selecteert app/plugins/now.ts automatisch vandaag
 const timetableDay = useState<DayKey>('timetable-day', () => 'vrijdag')
-const { openLegend } = useLegend()
+const { open: legendOpen, openLegend } = useLegend()
 const { frozen, toggle: toggleFakeNow } = useFakeNow()
 </script>
 
@@ -56,6 +56,7 @@ const { frozen, toggle: toggleFakeNow } = useFakeNow()
       <button
         type="button"
         class="ww-nav-btn"
+        :class="{ 'ww-nav-btn-active': legendOpen }"
         aria-label="Uitleg"
         title="Snap je er niks van?"
         @click="openLegend"

@@ -151,6 +151,23 @@ h1, h2, h3, h4 {
   color: var(--ww-accent, var(--color-lila-500));
 }
 
+/* Tactiele druk-feedback: even indrukken op klik/tik. Werkt ook op touch (:active
+   vuurt bij touchstart zolang er cursor-pointer op staat). Alleen met bewegings-
+   voorkeur; de transform krijgt z'n eigen korte timing zodat de kleur-overgang
+   200ms blijft. */
+@media (prefers-reduced-motion: no-preference) {
+  .ww-btn,
+  .ww-btn-solid,
+  .ww-nav-btn {
+    transition: color .2s, background-color .2s, transform .12s ease-out;
+  }
+  .ww-btn:active,
+  .ww-btn-solid:active,
+  .ww-nav-btn:active {
+    transform: scale(0.95);
+  }
+}
+
 /* Hover-inversies alleen op apparaten met een echte hover (muis): op touch
    blijft een :hover anders 'plakken' na een tik tot je ergens anders tikt. */
 @media (hover: hover) {

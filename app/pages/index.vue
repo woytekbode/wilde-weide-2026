@@ -15,6 +15,7 @@ onMounted(() => {
 })
 
 const deelLink = computed(() => gemaakt.value ? `${location.origin}/groep/${gemaakt.value.slug}` : '')
+const gekopieerd = ref(false)
 
 async function verstuur() {
   const ingevuld = naam.value.trim()
@@ -46,7 +47,7 @@ async function verstuur() {
 async function kopieerLink() {
   try {
     await navigator.clipboard.writeText(deelLink.value)
-    useToast().add({ title: 'Link gekopieerd' })
+    gekopieerd.value = true
   } catch {
     useToast().add({ title: 'Kopiëren mislukt — kopieer de link handmatig', color: 'error' })
   }
@@ -92,10 +93,17 @@ async function kopieerLink() {
       </p>
       <div class="ww-card-flat bg-stone-50 p-3 text-sm font-bold break-all">{{ deelLink }}</div>
       <div class="flex flex-col gap-2 sm:flex-row">
-        <button class="ww-btn-solid relative flex-1" @click="kopieerLink">
-          Kopieer link
-          <span class="ww-btn-circle absolute right-1 top-1/2 -translate-y-1/2">
-            <UIcon name="i-lucide-link" class="size-4" />
+        <button
+          class="relative flex-1"
+          :class="gekopieerd ? 'ww-btn' : 'ww-btn-solid'"
+          @click="kopieerLink"
+        >
+          {{ gekopieerd ? 'Link gekopieerd' : 'Kopieer link' }}
+          <span
+            class="absolute right-1 top-1/2 flex size-7 shrink-0 -translate-y-1/2 items-center justify-center rounded-full"
+            :class="gekopieerd ? 'bg-black text-white' : 'ww-btn-circle'"
+          >
+            <UIcon :name="gekopieerd ? 'i-lucide-check' : 'i-lucide-link'" class="size-4" />
           </span>
         </button>
         <NuxtLink :to="`/groep/${gemaakt.slug}`" class="ww-btn-solid relative flex-1 text-center">
