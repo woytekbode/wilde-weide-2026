@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'nl' },
-      title: 'Wilde Weide 2026 — ons schema',
+      title: 'Wilde Weide 2026 — met wie ga jij?',
       meta: [
         { name: 'description', content: 'Ons eigen blokkenschema voor Wilde Weide Festival, 3-5 juli 2026' },
         { name: 'theme-color', content: '#a48dbe' }
