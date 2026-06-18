@@ -1,13 +1,45 @@
-# Wilde Weide 2026 — ons schema
+# Wilde Weide 2026 — met wie ga jij?
 
-Statische webapp met ons eigen blokkenschema voor [Wilde Weide Festival](https://wildeweide.nl/) (3–5 juli 2026, Netl de Wildste Tuin, Kraggenburg). Gebouwd met Nuxt 4 + Nuxt UI, stijl losjes gebaseerd op de festivalsite.
+Een eigen festivalplanner voor [Wilde Weide Festival](https://wildeweide.nl/) (3.4.5 juli 2026, Netl de Wildste Tuin, Kraggenburg). Je verzint een **groepsnaam**, deelt de link met je vrienden (of vage kennissen), en samen scoren jullie het programma met **hartjes** — iedereen ziet elkaars keuzes. Gebouwd met Nuxt 4 + Nuxt UI, stijl losjes gepikt van de festivalsite.
 
-## Views
+## Hoe werkt het?
 
-- **/** — blokkenschema per dag (stages als kolommen), met conflictmarkering (`!`) tussen favorieten, suggestie-markering (`?`) en een uitklapbare conflictlijst
-- **/tabel** — sorteerbare tabel met filters (dag, stage, genre, type, score)
-- **/acts** — actsoverzicht met dezelfde filters
-- **/stages** — per dag en per stage in één zin de globale sfeer (uit [app/data/wildeweide-stages.json](app/data/wildeweide-stages.json))
+1. Open de site, vul bij **"Met wie ga jij?"** een nieuwe groepsnaam in — of een bestaande, dan sluit je je daarbij aan.
+2. Deel de link (`/groep/<naam>`) met je crew.
+3. Klik je favorieten vol hartjes. Alles wat jullie doen wordt gedeeld binnen de groep.
+
+Geen account, geen wachtwoord. De groepsnaam ís de sleutel.
+
+## Wat zit erin?
+
+De onderbalk (mobiel) en de nav bovenin (desktop) brengen je naar:
+
+- **Schema** — het blokkenschema per dag, podia als kolommen. Markeert een **Conflict** (`!`) als twee favorieten tegelijk spelen, een **Tip** (`?`) voor suggesties, en een zwarte **NU**-chip + nu-lijn voor wat er op dit moment speelt. Tik op een podiumnaam om dat **podium te verbergen**.
+- **Artiesten** — alle acts als kaartjes met genre, stijl en hartjes. Hoe meer hartjes, hoe dikker de schaduw.
+- **Sfeer** — de **sfeermakers** (hosting & acts die de boel maken): tik om te liken, je likes schuiven naar boven.
+- **Podia** — per dag en per podium in één zin wat voor sfeer je daar kunt verwachten.
+- **Kaart** — de **plattegrond**: knijp om te zoomen, tik om je **tent** te plaatsen. De tentlocatie is gedeeld, zodat de hele groep weet waar jullie kamperen.
+
+Er is ook een (verstopte) **Tabel** op `/groep/<naam>/tabel`: dezelfde acts, sorteerbaar en filterbaar.
+
+### Scoren met hartjes
+
+Hartjes zijn overal klikbaar (op de kaartjes, in de tabel, of via de detail-popup — op je telefoon gaat het via de popup):
+
+- **♥ / ♥♥ / ♥♥♥** — leuk tot "deze MOET je zien".
+- Klik op je huidige score om hem terug op **0** te zetten: beoordeeld, maar niet voor ons.
+- **Tip** (`?`) is een suggestie die nog geen hartjes heeft — kan je zelf niet kiezen, laat de groep beslissen.
+- **Reputatie** (✦✦✦) is wat Claude over een act zegt; puur extra context, het zegt niks over jullie voorkeur.
+
+### Tijdens het festival
+
+De views zijn tijdbewust (de klok tikt client-side per minuut):
+
+- afgelopen acts vervagen of worden grijs, en zijn met **verberg afgelopen** in de filterbalk weg te toveren;
+- de festivaldag van vandaag staat automatisch voorgeselecteerd (nachten tot 06:00 horen bij de vorige dag);
+- en kun je niet wachten? **Tijdreizen** (het klok-knopje) springt naar een willekeurig moment in het weekend en bevriest de klok — doe alsof je er al bent, zet een liedje op, doe een dansje.
+
+Previewen buiten het weekend kan ook met een query-parameter: `/?fakenow=2026-07-04T18:30:00`.
 
 ## Ontwikkelen
 
@@ -18,30 +50,22 @@ npm run generate   # statische build naar .output/public
 npm run typecheck
 ```
 
-## Scoren met hartjes
+In dev draait de groeps-API gewoon mee via Nitro (`/api/groep/...`), met een lokale KV in `.data/kv`. Heb je een KV-backup (`server/data/kv-backup.json`), dan seedt die de dev-KV met realistische groepsdata — anders start je met een lege KV en verzin je zelf een groep. Een snapshot van de live data trek je met `npm run backup-kv` (gitignored, niet committen — bevat privé group-slugs).
 
-Hartjes zijn overal klikbaar (hover over de hartjes op acts/tabel, of open de detail-popup — op je telefoon gaat scoren via de popup). Klikken op je huidige score zet hem terug naar **0** = beoordeeld, niet voor ons (suggestie wegwerken: 1 hartje klikken en nogmaals klikken). Persistentie verschilt per omgeving:
+## Achter de schermen
 
-- **Live site**: een klik bewaart een override in Cloudflare KV (namespace `wilde_weide_likes`, via [worker/index.ts](worker/index.ts) op `/api/scores`). Iedereen ziet elkaars scores na een refresh. **KV wint altijd van de JSON** op de site.
-- **Dev** (`npm run dev`): een klik schrijft direct in de programma-JSON (`/api/score`); `git diff` → commit + push.
+De statische site staat op Cloudflare; daarnaast draait een **Worker** ([worker/index.ts](worker/index.ts)) met de groeps-API op **Workers KV**. Per groep liggen er losse blobs:
 
-Live scores terughalen naar de repo: `npm run pull-scores` merget de KV-overrides in de JSON (daarna zelf committen). Let op de KV-wint-regel: een score die je daarna in de JSON aanpast blijft op de site overschaduwd door de KV-entry; corrigeer via de site zelf of verwijder de override met `POST /api/scores {"id": "...", "score": null}`.
+- `groepen` — het register van groepsnamen
+- `scores:<slug>` — de hartjes-scores
+- `sfeer:<slug>` — de sfeermaker-likes
+- `tent:<slug>` — de gedeelde tentlocatie
 
-Let op: de dev-server herlaadt dit JSON-bestand bewust niet (zie `vite.server.watch.ignored` in `nuxt.config.ts`), anders zou elke klik een page-reload geven. Bewerk je de JSON handmatig terwijl de dev-server draait, herstart die dan even.
-
-## Tijdens het festival
-
-De views zijn tijdbewust (klok tikt per minuut, client-side):
-
-- afgelopen acts vervagen (blokken/acts) of worden grijs gedempt (tabel), en zijn met **verberg afgelopen** in de filterbalk te verbergen
-- acts die nu spelen krijgen een zwarte **NU**-chip; het blokkenschema toont een **nu-lijn** op de huidige tijd en scrollt daarheen
-- de festivaldag van vandaag wordt automatisch voorgeselecteerd (nachten tot 06:00 horen bij de vorige dag)
-
-Testen/previewen buiten het weekend kan met een query-parameter, ook op de live site: `/?fakenow=2026-07-04T18:30:00`.
+Read-modify-write per blob is last-write-wins; voor een vriendengroep prima. Er is een **Badmeester**-paneel op `/badmeester` (token-gated) om groepen te bekijken en op te ruimen.
 
 ## Data
 
-Alle data staat in [app/data/wildeweide-programma.json](app/data/wildeweide-programma.json) en wordt build-time geïmporteerd. Structuur: `{ "festival": { name, dates, location, stages[], types[], genres[], legend }, "days": [{ day, date, acts: [...] }] }`, per act:
+Alle programma-data staat in [app/data/wildeweide-programma.json](app/data/wildeweide-programma.json) en wordt build-time geïmporteerd. Structuur: `{ "festival": { name, dates, location, stages[], types[], genres[], legend }, "days": [{ day, date, acts: [...] }] }`, per act:
 
 ```json
 {
@@ -66,12 +90,11 @@ Alle data staat in [app/data/wildeweide-programma.json](app/data/wildeweide-prog
 ```
 
 - `type` en `genre` zijn vaste filter-buckets uit `festival.types` / `festival.genres`; `style` is de precieze typering
-- `score`: 1–3 (hartjes, 3 = echt zien), `null` = geen score; `status`: `scored` / `suggested` (nog te scoren) / `unscored`
+- `score`: 1–3 (hartjes, 3 = echt zien), `null` = geen score; `status`: `scored` / `suggested` (Tip) / `unscored`
 - `liveRep`: live-reputatie 1–3 (✦), alleen extra context
-- `host`: gevuld als de act onderdeel is van een hosting-blok; `curator`: naam, of letterlijk `"curator"` als de act zelf curator is
 - acts ná middernacht horen bij de festivaldag waaronder ze genest staan (de ISO-datum loopt dan een dag voor)
 
-Badge-kleuren per genre/stage staan in [app/data/display.ts](app/data/display.ts).
+De sfeermakers staan in [app/data/wildeweide-sfeermakers.json](app/data/wildeweide-sfeermakers.json), de podium-sfeer in [app/data/wildeweide-stages.json](app/data/wildeweide-stages.json), en de badge-kleuren per genre/podium in [app/data/display.ts](app/data/display.ts).
 
 ## Deployen (Cloudflare Workers Builds)
 
@@ -80,6 +103,4 @@ De repo is gekoppeld aan Cloudflare via **Workers & Pages → Connect to Git**. 
 - **Build command**: `npm run generate`
 - **Deploy command**: `npx wrangler deploy`
 
-Eigen subdomein: Worker → **Settings → Domains & Routes → Add → Custom domain**.
-
-Elke push naar `main` deployt automatisch.
+Eigen subdomein: Worker → **Settings → Domains & Routes → Add → Custom domain**. Elke push naar `main` deployt automatisch.
