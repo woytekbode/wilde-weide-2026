@@ -1,5 +1,5 @@
 import type { GroepenRegister } from '#shared/groep'
-import { GROEPEN_KEY, isAdminGroep, isGeldigeGroepSlug, scoresKey, sfeerKey } from '#shared/groep'
+import { GROEPEN_KEY, isAdminGroep, isGeldigeGroepSlug, scoresKey, sfeerKey, statsKey, tentKey } from '#shared/groep'
 
 /** Dev-spiegel van DELETE /api/admin/groep/:slug in worker/index.ts */
 export default defineEventHandler(async (event) => {
@@ -23,6 +23,8 @@ export default defineEventHandler(async (event) => {
   }
   await kv.removeItem(scoresKey(slug))
   await kv.removeItem(sfeerKey(slug))
+  await kv.removeItem(tentKey(slug))
+  await kv.removeItem(statsKey(slug))
   delete groepen[slug]
   await kv.setItem(GROEPEN_KEY, groepen)
   return { ok: true }

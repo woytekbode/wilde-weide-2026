@@ -1,5 +1,44 @@
 import { GROEP_LS_KEY, GROEP_NAAM_LS_KEY } from '#shared/groep'
 
+const SID_LS_KEY = 'ww-sid'
+const BEZOEK_LS_PREFIX = 'ww-bezoek:'
+/** niet vaker dan eens per 30 min per groep een bezoek-ping (KV-schrijfacties laag houden) */
+const BEZOEK_THROTTLE_MS = 30 * 60 * 1000
+
+/**
+ * Pseudonieme, willekeurige sessie-id per apparaat (localStorage). Puur om de
+ * groepsgrootte ruw te schatten; bevat geen persoonlijke gegevens en wordt nooit
+ * over groepen heen gekoppeld.
+ */
+export function sessieId(): string {
+  if (!import.meta.client) return ''
+  let sid = localStorage.getItem(SID_LS_KEY)
+  if (!sid) {
+    sid = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+    localStorage.setItem(SID_LS_KEY, sid)
+  }
+  return sid
+}
+
+/** true als deze groep binnen het throttle-venster al gepingd is */
+export function bezoekRecent(slug: string): boolean {
+  if (!import.meta.client) return true
+  try {
+    const last = Number(localStorage.getItem(BEZOEK_LS_PREFIX + slug) ?? 0)
+    return Date.now() - last < BEZOEK_THROTTLE_MS
+  } catch {
+    return false
+  }
+}
+
+/** onthoud dat we zojuist een bezoek-ping voor deze groep verstuurd hebben */
+export function markBezoek(slug: string): void {
+  if (!import.meta.client) return
+  try {
+    localStorage.setItem(BEZOEK_LS_PREFIX + slug, String(Date.now()))
+  } catch { /* storage vol/geblokkeerd: dan pingen we gewoon vaker */ }
+}
+
 /** actieve groep (uit de route) + de laatst gebruikte groep in localStorage */
 export function useGroep() {
   const route = useRoute()

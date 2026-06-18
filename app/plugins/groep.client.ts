@@ -53,6 +53,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     groepNaam.value = info.naam
     rememberGroep(slug, info.naam)
 
+    // activiteits-ping (fire-and-forget, gethrottled): voedt de Badmeester-stats
+    if (!bezoekRecent(slug)) {
+      markBezoek(slug)
+      $fetch(`/api/groep/${slug}/bezoek`, { method: 'POST', body: { sid: sessieId() } })
+        .catch(() => { /* stats zijn niet kritisch */ })
+    }
+
     try {
       const [scores, likes, tent] = await Promise.all([
         $fetch<GroepScoreMap>(`/api/groep/${slug}/scores`),
