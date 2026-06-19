@@ -1,5 +1,8 @@
 export type ActStatus = 'scored' | 'suggested' | 'unscored'
 
+/** twee parallelle programma's met een eigen blokkenschema; nooit tegelijk getoond */
+export type Programme = 'muziek' | 'sfeermakers'
+
 export interface SourceAct {
   time: string
   start: string
@@ -47,6 +50,8 @@ export type DayKey = 'donderdag' | 'vrijdag' | 'zaterdag' | 'zondag'
 
 export interface Act extends SourceAct {
   id: string
+  /** uit welk programma deze act komt (muziek of sfeermakers) */
+  programme: Programme
   dayKey: DayKey
   dayLabel: string
   dayDate: string

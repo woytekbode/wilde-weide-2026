@@ -1,13 +1,18 @@
-const HIDDEN_STAGES_LS_KEY = 'timetable-hidden-stages'
-const HINT_DONE_LS_KEY = 'timetable-stage-hint-done'
+import type { Programme } from '~/types/program'
 
 /**
  * Filterstatus van het blokkenschema: de score-drempel dimt tegels (i.p.v.
  * verbergen zoals op acts/tabel) en stages zijn per device te verbergen.
+ *
+ * Per programma (muziek/sfeermakers) een eigen state + localStorage-sleutel,
+ * zodat de twee blokkenschema's onafhankelijk filteren en stages verbergen.
  */
-export function useTimetableFilters() {
-  const minScore = useState<number>('timetable-minscore', () => 0)
-  const hiddenStages = useState<string[]>('timetable-hidden-stages', () => [])
+export function useTimetableFilters(programme: Programme = 'muziek') {
+  const HIDDEN_STAGES_LS_KEY = `timetable-hidden-stages-${programme}`
+  const HINT_DONE_LS_KEY = `timetable-stage-hint-done-${programme}`
+
+  const minScore = useState<number>(`timetable-minscore-${programme}`, () => 0)
+  const hiddenStages = useState<string[]>(`timetable-hidden-stages-${programme}`, () => [])
 
   /**
    * Herstelt de verborgen stages uit localStorage. Aanroepen vanuit onMounted
@@ -26,7 +31,7 @@ export function useTimetableFilters() {
     // wie al stages verborgen heeft, kent de truc → geen wiggle-hint meer
     if (hiddenStages.value.length > 0) markStageHintDone()
   }
-  const restored = useState<boolean>('timetable-hidden-stages-restored', () => false)
+  const restored = useState<boolean>(`timetable-hidden-stages-restored-${programme}`, () => false)
 
   /**
    * Eenmalige onboarding-hint (wiggle-wave op de stagechips): blijft pending tot

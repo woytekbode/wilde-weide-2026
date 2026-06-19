@@ -43,8 +43,8 @@ const metaLine = computed(() =>
               class="rounded-full border-2 border-black px-2 py-0.5"
               :class="dayMeta?.accentSoft"
             >{{ dayMeta?.label }} · {{ act.time }}</span>
-            <StageBadge :stage="act.stage" />
-            <span v-if="act.genre" class="rounded-full border-2 border-black px-2 py-0.5 text-xs" :class="genreColor(act.genre)">
+            <StageBadge :stage="act.stage" :programme="act.programme" />
+            <span v-if="act.genre" class="rounded-full border-2 border-black px-2 py-0.5 text-xs" :class="genreColor(act.genre, act.programme)">
               {{ act.genre }}
             </span>
           </div>

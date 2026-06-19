@@ -1,6 +1,6 @@
 import type { Act } from '~/types/program'
 import type { GroepScoreMap, GroepSfeerMap, GroepTent } from '#shared/groep'
-import { buildActs } from '~/composables/useActs'
+import { buildActs, buildSfeerActs, useProgramme } from '~/composables/useActs'
 import { buildSfeerItems } from '~/composables/useSfeer'
 
 /**
@@ -12,6 +12,7 @@ import { buildSfeerItems } from '~/composables/useSfeer'
 export default defineNuxtPlugin((nuxtApp) => {
   const route = useRoute()
   const { acts } = useActs()
+  const { acts: sfeerActs } = useProgramme('sfeermakers')
   const { items: sfeerItems } = useSfeer()
   const { tent: tentPos } = useTent()
   const { groepNaam, rememberGroep, forgetGroep } = useGroep()
@@ -29,6 +30,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     detailsAct.value = null
     detailsOpen.value = false
     acts.value = buildActs()
+    sfeerActs.value = buildSfeerActs()
     sfeerItems.value = buildSfeerItems()
     tentPos.value = null
     groepNaam.value = ''
@@ -68,7 +70,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       ])
       if (token !== laadToken) return
 
-      const byId = new Map<string, Act>(acts.value.map(a => [a.id, a]))
+      // één scores-blob per groep dekt beide programma's (ids zijn genamespaced)
+      const byId = new Map<string, Act>([...acts.value, ...sfeerActs.value].map(a => [a.id, a]))
       for (const [id, entry] of Object.entries(scores)) {
         const act = byId.get(id)
         if (!act) continue

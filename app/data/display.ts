@@ -1,4 +1,5 @@
-import type { DayKey } from '~/types/program'
+import type { DayKey, Programme } from '~/types/program'
+import sfeerProgram from '~/data/wildeweide-er-is-nog-meer-programma.json'
 
 export interface DayMeta {
   key: DayKey
@@ -91,8 +92,19 @@ export const STAGE_COLORS: Record<string, string> = {
   'De Spot': 'bg-[#a3c2cf]'
 }
 
-export function stageColor(stage: string): string {
-  return STAGE_COLORS[stage] ?? 'bg-stone-300'
+/**
+ * Sfeermaker-programma hergebruikt de muziekpaletten (de twee schema's worden
+ * nooit samen getoond): de i-de sfeerstage/-categorie krijgt de i-de kleur uit
+ * STAGE_COLORS / GENRE_COLORS. Op naam-index, zodat de kleuren stabiel zijn.
+ */
+const STAGE_PALETTE = Object.values(STAGE_COLORS)
+const SFEER_STAGE_COLORS: Record<string, string> = Object.fromEntries(
+  (sfeerProgram.festival.stages as string[]).map((s, i) => [s, STAGE_PALETTE[i % STAGE_PALETTE.length]!])
+)
+
+export function stageColor(stage: string, programme: Programme = 'muziek'): string {
+  const map = programme === 'sfeermakers' ? SFEER_STAGE_COLORS : STAGE_COLORS
+  return map[stage] ?? 'bg-stone-300'
 }
 
 /** Badge-kleuren per genre-bucket (lichte vulling + zwarte rand) */
@@ -108,8 +120,14 @@ export const GENRE_COLORS: Record<string, string> = {
   'pop & indie': 'bg-pink-200'
 }
 
-export function genreColor(genre: string): string {
-  return GENRE_COLORS[genre] ?? 'bg-stone-300'
+const GENRE_PALETTE = Object.values(GENRE_COLORS)
+const SFEER_GENRE_COLORS: Record<string, string> = Object.fromEntries(
+  (sfeerProgram.festival.categories as string[]).map((c, i) => [c, GENRE_PALETTE[i % GENRE_PALETTE.length]!])
+)
+
+export function genreColor(genre: string, programme: Programme = 'muziek'): string {
+  const map = programme === 'sfeermakers' ? SFEER_GENRE_COLORS : GENRE_COLORS
+  return map[genre] ?? 'bg-stone-300'
 }
 
 /** minuten sinds 00:00 van de festivaldag → 'HH:MM' op de klok */

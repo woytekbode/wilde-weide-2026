@@ -1,18 +1,38 @@
 <script setup lang="ts">
 import { DAY_META } from '~/data/display'
-import type { DayKey } from '~/types/program'
+import type { DayKey, Programme } from '~/types/program'
 
 // tijdens het weekend selecteert app/plugins/now.ts automatisch vandaag
 const timetableDay = useState<DayKey>('timetable-day', () => 'vrijdag')
 const { open: legendOpen, openLegend } = useLegend()
 const { frozen, toggle: toggleFakeNow } = useFakeNow()
+
+// muziek- of sfeermaker-blokkenschema; nooit tegelijk getoond
+const programme = useState<Programme>('programme', () => 'muziek')
+const { acts: musicActs } = useProgramme('muziek')
+const { acts: sfeerActs } = useProgramme('sfeermakers')
+
+// alleen de dagen die dit programma daadwerkelijk heeft (sfeermakers: geen donderdag)
+const availableDays = computed(() => {
+  const src = programme.value === 'muziek' ? musicActs.value : sfeerActs.value
+  const keys = new Set(src.map(a => a.dayKey))
+  return DAY_META.filter(d => keys.has(d.key))
+})
+
+// na een programmawissel: val terug op de eerste beschikbare dag als de huidige
+// dag in het nieuwe programma niet bestaat
+watch(programme, () => {
+  if (!availableDays.value.some(d => d.key === timetableDay.value)) {
+    timetableDay.value = availableDays.value[0]?.key ?? 'vrijdag'
+  }
+})
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="flex flex-wrap gap-2">
       <button
-        v-for="day in DAY_META"
+        v-for="day in availableDays"
         :key="day.key"
         class="ww-nav-btn"
         :class="{ 'ww-nav-btn-active': timetableDay === day.key }"
@@ -63,8 +83,8 @@ const { frozen, toggle: toggleFakeNow } = useFakeNow()
       >?</button>
     </div>
 
-    <TimetableFilterBar />
+    <TimetableFilterBar :key="programme" :programme="programme" />
 
-    <TimetableGrid :day="timetableDay" />
+    <TimetableGrid :key="programme" :day="timetableDay" :programme="programme" />
   </div>
 </template>

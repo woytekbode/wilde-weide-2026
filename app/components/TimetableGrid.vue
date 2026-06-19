@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Act, DayKey } from '~/types/program'
+import type { Act, DayKey, Programme } from '~/types/program'
 import { actTimeStatus, festivalDayKeyFor, minToHour, stageColor } from '~/data/display'
 
-const props = defineProps<{ day: DayKey }>()
+const props = withDefaults(defineProps<{ day: DayKey, programme?: Programme }>(), { programme: 'muziek' })
 
 const SLOT = 15 // minuten per gridrij
 
@@ -10,8 +10,8 @@ const SLOT = 15 // minuten per gridrij
 const CONFLICT_MIN_SCORE = 2
 const CONFLICT_INCLUDE_SUGGESTED = false
 
-const { actsForDay, conflictActIds, festival } = useActs()
-const { minScore, hiddenStages, toggleStage, restoreHiddenStages, stageHintPending } = useTimetableFilters()
+const { actsForDay, conflictActIds, festival } = useProgramme(props.programme)
+const { minScore, hiddenStages, toggleStage, restoreHiddenStages, stageHintPending } = useTimetableFilters(props.programme)
 const { show } = useActDetails()
 
 // eenmalige squish-wave over de stagechips zodat (vooral op mobiel, zonder
@@ -190,7 +190,7 @@ function blockStyle(act: Act) {
         v-for="(stage, i) in stages"
         :key="stage"
         class="mb-1.5 cursor-pointer rounded-full border-[3px] border-black py-1 text-center text-xs font-bold transition-transform hover:scale-95 motion-safe:active:scale-95"
-        :class="[stageColor(stage), { 'ww-stage-squish': hintSquish }]"
+        :class="[stageColor(stage, programme), { 'ww-stage-squish': hintSquish }]"
         :style="{ gridColumn: String(i + 2), gridRow: '1', viewTransitionName: `stage-${slugify(stage)}`, viewTransitionClass: 'ww-chip', animationDelay: hintSquish ? `${i * 90}ms` : undefined }"
         title="verberg stage"
         @click="toggleStage(stage)"
@@ -228,7 +228,7 @@ function blockStyle(act: Act) {
         class="relative cursor-pointer overflow-hidden rounded-(--ui-radius) border-[3px] border-black text-left transition-transform hover:z-20 hover:scale-[1.02]"
         :class="[
           rowSpan(act) <= 3 ? 'p-1' : 'p-1.5',
-          act.score ? stageColor(act.stage) : 'bg-white',
+          act.score ? stageColor(act.stage, programme) : 'bg-white',
           act.score === 3 ? 'shadow-[3px_3px_0_0_#000]' : act.score === 2 ? 'shadow-[1.5px_1.5px_0_0_#000]' : '',
           !passesScore(act, minScore) ? 'opacity-25' : actTimeStatus(act, now) === 'past' ? 'opacity-40' : ''
         ]"

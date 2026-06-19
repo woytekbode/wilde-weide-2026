@@ -1,17 +1,62 @@
-import program from '~/data/wildeweide-programma.json'
-import type { Act, Conflict, DayKey, Program } from '~/types/program'
-import { DAY_META } from '~/data/display'
+import musicProgram from '~/data/wildeweide-programma.json'
+import sfeerProgram from '~/data/wildeweide-er-is-nog-meer-programma.json'
+import type { Act, Conflict, DayKey, Program, Programme, SourceAct } from '~/types/program'
 
-const typedProgram = program as unknown as Program
+const typedMusic = musicProgram as unknown as Program
+
+/**
+ * Sfeermaker-programma: zelfde vorm als het muziekprogramma, maar met `category`
+ * i.p.v. `genre` en zonder de muziek-only velden (style, liveRep, …).
+ */
+interface SfeerSourceAct {
+  time: string
+  start: string
+  end: string
+  stage: string
+  artist: string
+  host: string | null
+  type: string | null
+  category: string
+  description: string | null
+}
+interface SfeerProgram {
+  festival: Omit<Program['festival'], 'genres'> & { categories: string[] }
+  days: { day: string, date: string, acts: SfeerSourceAct[] }[]
+}
+const typedSfeer = sfeerProgram as unknown as SfeerProgram
 
 export function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
-/** neutrale acts uit de statische JSON; scores/suggesties komen per groep uit KV */
-export function buildActs(): Act[] {
+/** sfeermaker-act → neutrale SourceAct: category wordt de genre-bucket, host die
+ *  gelijk is aan de stage valt weg (anders dubbel in 'onderdeel van') */
+function sfeerToSource(a: SfeerSourceAct): SourceAct {
+  return {
+    time: a.time,
+    start: a.start,
+    end: a.end,
+    stage: a.stage,
+    artist: a.artist,
+    host: a.host && a.host !== a.stage ? a.host : null,
+    type: a.type,
+    genre: a.category,
+    style: null,
+    liveRep: null,
+    liveImpression: null,
+    description: a.description,
+    country: null,
+    curator: null,
+    spotify: null
+  }
+}
+
+type SourceDay = { day: string, date: string, acts: SourceAct[] }
+
+/** neutrale acts uit statische JSON; scores/suggesties komen per groep uit KV */
+function assemble(days: SourceDay[], programme: Programme, idPrefix: string): Act[] {
   const acts: Act[] = []
-  for (const day of typedProgram.days) {
+  for (const day of days) {
     const dayKey = day.day.split(' ')[0]!.toLowerCase() as DayKey
     const midnight = new Date(`${day.date}T00:00:00`).getTime()
     for (const src of day.acts) {
@@ -19,7 +64,8 @@ export function buildActs(): Act[] {
       const endMin = (new Date(src.end).getTime() - midnight) / 60000
       acts.push({
         ...src,
-        id: `${dayKey}-${slugify(src.artist)}-${src.start.slice(11, 16)}`,
+        id: `${idPrefix}${dayKey}-${slugify(src.artist)}-${src.start.slice(11, 16)}`,
+        programme,
         dayKey,
         dayLabel: day.day,
         dayDate: day.date,
@@ -33,13 +79,39 @@ export function buildActs(): Act[] {
   return acts.sort((a, b) => a.dayDate.localeCompare(b.dayDate) || a.startMin - b.startMin || a.stage.localeCompare(b.stage))
 }
 
+export function buildActs(): Act[] {
+  return assemble(typedMusic.days, 'muziek', '')
+}
+
+export function buildSfeerActs(): Act[] {
+  const days: SourceDay[] = typedSfeer.days.map(d => ({
+    day: d.day,
+    date: d.date,
+    acts: d.acts.map(sfeerToSource)
+  }))
+  return assemble(days, 'sfeermakers', 'sfeermaker-')
+}
+
+interface Dataset {
+  festival: Program['festival']
+  build: () => Act[]
+  stateKey: string
+}
+
+const DATASETS: Record<Programme, Dataset> = {
+  muziek: { festival: typedMusic.festival, build: buildActs, stateKey: 'acts' },
+  sfeermakers: { festival: typedSfeer.festival as unknown as Program['festival'], build: buildSfeerActs, stateKey: 'acts-sfeermakers' }
+}
+
 function overlaps(a: Act, b: Act): boolean {
   return a.startMin < b.endMin && b.startMin < a.endMin
 }
 
-export function useActs() {
+/** dataset + helpers voor één programma; muziek en sfeermakers leven in aparte state */
+export function useProgramme(programme: Programme) {
+  const ds = DATASETS[programme]
   // in state zodat scores en groepswissels overal reactief doorwerken
-  const acts = useState<Act[]>('acts', buildActs)
+  const acts = useState<Act[]>(ds.stateKey, ds.build)
 
   function actsForDay(dayKey: DayKey): Act[] {
     return acts.value.filter(a => a.dayKey === dayKey)
@@ -91,10 +163,15 @@ export function useActs() {
   }
 
   return {
-    festival: typedProgram.festival,
+    festival: ds.festival,
     acts,
-    stages: typedProgram.festival.stages,
+    stages: ds.festival.stages,
     actsForDay,
     conflictActIds
   }
+}
+
+/** muziekprogramma (default); bestaande callers blijven werken */
+export function useActs() {
+  return useProgramme('muziek')
 }
