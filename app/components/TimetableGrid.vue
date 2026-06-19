@@ -267,7 +267,7 @@ function blockStyle(act: Act) {
           <div class="mt-0.5 text-xs font-black leading-tight" :class="LINE_CLAMP[nameLines(act)]">{{ act.artist }}</div>
           <div v-if="rowSpan(act) >= 4 && act.style" class="truncate text-[10px] leading-tight">{{ act.style }}</div>
           <!-- ♥♥ / ✦✦; anders dan op de acts-pagina blijven de sterren ook bij ♥♥♥ staan -->
-          <div v-if="hasMarks(act)" class="inline-flex items-center text-[11px] leading-none">
+          <div v-if="hasMarks(act)" class="flex items-center text-[11px] leading-none">
             <HeartMarks v-if="act.score" :filled="act.score" size="size-2.5" />
             <HeartMarks v-else-if="act.status === 'suggested'" tip size="size-2.5" />
             <span v-if="(act.score || act.status === 'suggested') && act.liveRep" class="mx-0.5 font-bold">/</span>
