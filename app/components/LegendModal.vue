@@ -60,7 +60,7 @@ if (import.meta.client) {
             <!-- reputatie -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <StarMarks :count="3" size="size-3.5" />
+                <StarMarks :count="3" size="size-3" />
               </div>
               <p class="text-sm">
                 <span class="font-bold">Reputatie</span> wat Claude zegt, zegt natuurlijk niks over jullie voorkeur!
@@ -70,7 +70,7 @@ if (import.meta.client) {
             <!-- hartjes -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 flex-col items-center justify-center gap-0.5 leading-none">
-                <HeartMarks :filled="3" size="size-3.5" />
+                <HeartMarks :filled="3" size="size-3" />
               </div>
               <p class="text-sm">
                 <span class="font-bold">Hartjes</span> deze MOET je zien (als je niet verdwaald bent of honger hebt).
