@@ -3,6 +3,7 @@ import type { TableColumn, TableRow } from '@nuxt/ui'
 import { UButton } from '#components'
 import StageBadge from '~/components/StageBadge.vue'
 import HeartScore from '~/components/HeartScore.vue'
+import StarMarks from '~/components/StarMarks.vue'
 import { actTimeStatus, DAY_META, genreColor } from '~/data/display'
 import type { Act, } from '~/types/program'
 import type { VNode } from 'vue'
@@ -82,7 +83,7 @@ const columns: TableColumn<Act>[] = [
   {
     accessorKey: 'liveRep',
     header: sortableHeader('Live'),
-    cell: ({ row }) => mute(row.original, h('span', { class: 'text-sm' }, '✦'.repeat(row.original.liveRep ?? 0)))
+    cell: ({ row }) => mute(row.original, h(StarMarks, { count: row.original.liveRep ?? 0, size: 'size-3.5' }))
   }
 ]
 

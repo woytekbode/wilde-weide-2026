@@ -67,7 +67,7 @@ const metaLine = computed(() =>
               <!-- uit: hover vult geel voor (toevoegen). aan: geel; op hover
                    zwart met een kruisje (klik = weghalen) -->
               <span
-                class="flex size-6 items-center justify-center rounded-full border-2 border-black text-xs font-black transition-colors"
+                class="flex size-5 items-center justify-center rounded-full border-2 border-black text-[10px] font-black transition-colors"
                 :class="act.status === 'suggested' ? 'bg-yellow-300 text-black group-hover:bg-black group-hover:text-white' : 'bg-white group-hover:bg-yellow-300'"
               >
                 <template v-if="act.status === 'suggested'">
@@ -88,7 +88,7 @@ const metaLine = computed(() =>
           <p v-if="act.description" class="text-base">{{ act.description }}</p>
 
           <div v-if="act.liveImpression" class="ww-card-flat bg-stone-50 p-3 text-sm">
-            <div class="mb-1 font-bold">Reputatie ({{ '✦'.repeat(act.liveRep ?? 0) }})</div>
+            <div class="mb-1 inline-flex items-center font-bold">Reputatie&nbsp;(<StarMarks :count="act.liveRep ?? 0" size="size-3.5" />)</div>
             {{ act.liveImpression }}
           </div>
 

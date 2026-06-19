@@ -27,8 +27,8 @@ const { sorted, toggleLike } = useSfeer()
       >
         <span
           v-if="item.liked"
-          class="absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full border-2 border-black bg-white text-xs text-red-600"
-        >♥</span>
+          class="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full border-2 border-black bg-white"
+        ><HeartMarks :filled="1" size="size-3.5" /></span>
         <div class="mb-1.5 flex flex-wrap items-center gap-1.5 text-xs font-bold">
           <span
             class="rounded-full border-2 border-black px-1.5 text-[10px]"

@@ -60,7 +60,7 @@ if (import.meta.client) {
             <!-- reputatie -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <span class="text-xl font-bold leading-none">✦✦✦</span>
+                <StarMarks :count="3" size="size-3.5" />
               </div>
               <p class="text-sm">
                 <span class="font-bold">Reputatie</span> wat Claude zegt, zegt natuurlijk niks over jullie voorkeur!
@@ -70,7 +70,7 @@ if (import.meta.client) {
             <!-- hartjes -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 flex-col items-center justify-center gap-0.5 leading-none">
-                <span class="text-xl text-red-600">♥♥♥</span>
+                <HeartMarks :filled="3" size="size-3.5" />
               </div>
               <p class="text-sm">
                 <span class="font-bold">Hartjes</span> deze MOET je zien (als je niet verdwaald bent of honger hebt).
@@ -80,7 +80,7 @@ if (import.meta.client) {
             <!-- tip -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <span class="flex size-6 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-xs font-black">?</span>
+                <span class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-[10px] font-black">?</span>
               </div>
               <p class="text-sm">
                 <span class="font-bold">Tip</span> kan je zelf geen keuze maken? Laat iemand anders het doen!
@@ -90,7 +90,7 @@ if (import.meta.client) {
             <!-- conflict -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <span class="flex size-6 items-center justify-center rounded-full border-2 border-black bg-red-400 text-xs font-black">!</span>
+                <span class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-red-400 text-[10px] font-black">!</span>
               </div>
               <p class="text-sm">
                 <span class="font-bold">Conflict</span> aii, jouw favorieten hebben hetzelfde timeslot.
@@ -100,7 +100,7 @@ if (import.meta.client) {
             <!-- tijdreizen -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <UIcon name="i-lucide-clock-fading" class="block size-6" />
+                <UIcon name="i-lucide-clock-fading" class="block size-5" />
               </div>
               <p class="text-sm">
                 <span class="font-bold">Tijdreizen</span> geen geduld tot het weekend? Doe net alsof je er al bent, zet een liedje op en doe een dansje.

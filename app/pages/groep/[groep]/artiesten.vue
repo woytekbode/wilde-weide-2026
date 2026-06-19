@@ -31,7 +31,7 @@ function dayShort(act: Act): string {
       >
         <span
           v-if="act.status === 'suggested'"
-          class="absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-xs font-black"
+          class="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-[10px] font-black"
           title="Tip — nog geen hartjes"
         >?</span>
         <div class="mb-1.5 flex flex-wrap items-center gap-1.5 text-xs font-bold">

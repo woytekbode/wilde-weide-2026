@@ -58,13 +58,22 @@ export const DAY_META: DayMeta[] = [
   }
 ]
 
-/** knoppen van de hartjes-selector, gedeeld door acts/tabel-filter en blokkenschema */
-export const SCORE_OPTIONS = [
+/**
+ * Knoppen van de hartjes-selector, gedeeld door acts/tabel-filter en blokkenschema.
+ * `label` is tekst (alleen 'alle'); `hearts` rendert via <HeartMarks> als SVG zodat
+ * de hartjes cross-platform even groot zijn (zie HeartMarks.vue).
+ */
+export const SCORE_OPTIONS: {
+  value: number
+  title: string
+  label?: string
+  hearts?: { filled?: number; tip?: boolean }
+}[] = [
   { value: 0, label: 'alle', title: 'alle acts' },
-  { value: 0.5, label: '♡♡♡', title: 'tips + alles met hartjes' },
-  { value: 1, label: '♥', title: 'minstens ♥' },
-  { value: 2, label: '♥♥', title: 'minstens ♥♥' },
-  { value: 3, label: '♥♥♥', title: 'alleen ♥♥♥' }
+  { value: 0.5, hearts: { tip: true }, title: 'tips + alles met hartjes' },
+  { value: 1, hearts: { filled: 1 }, title: 'minstens 1 hartje' },
+  { value: 2, hearts: { filled: 2 }, title: 'minstens 2 hartjes' },
+  { value: 3, hearts: { filled: 3 }, title: 'alleen 3 hartjes' }
 ]
 
 export const STAGE_COLORS: Record<string, string> = {

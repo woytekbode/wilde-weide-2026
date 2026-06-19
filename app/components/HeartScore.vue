@@ -22,9 +22,6 @@ const hovered = ref(0)
 // niveaus van 'vind ik leuk', gebruikt in de hartje-tooltips
 const HEART_LABELS = ['', 'leuk', 'heel leuk', 'moet ik zien']
 
-// grotere klikbare hartjes in de detail-slideover; compact (text-base) elders
-const heartSize = computed(() => props.size === 'lg' ? 'text-2xl' : 'text-base')
-
 // klikken op je huidige score zet hem terug naar 0 (beoordeeld, niet voor ons)
 function clickHeart(n: number) {
   setScore(props.act, props.act.score === n ? 0 : n)
@@ -50,22 +47,19 @@ function filled(n: number) {
   return n <= (hovered.value || props.act.score || 0)
 }
 
-// in de verwijder-hover morphen de gevulde hartjes naar een X (klik = weghalen)
+// in de verwijder-hover morphen de gevulde hartjes naar een doorgestreept
+// hartje (heart-off; klik = weghalen)
 function showX(n: number) {
   return removeHover.value && n <= (props.act.score || 0)
 }
 
-const xSize = computed(() => props.size === 'lg' ? 'size-6' : 'size-4')
+const xSize = computed(() => props.size === 'lg' ? 'size-5' : 'size-3.5')
 
 const showEditorAlways = computed(() => props.editor && canEdit)
 
-// reputatie naast de hartjes: '♥♥ / ✦✦✦'; zonder hartjes alleen de sterren
-const liveRepSuffix = computed(() => {
-  if (!props.showLiveRep || !props.act.liveRep) return ''
-  const stars = '✦'.repeat(props.act.liveRep)
-  const hasHearts = Boolean(props.act.score) || props.act.status === 'suggested'
-  return hasHearts ? ` / ${stars}` : stars
-})
+// reputatie naast de hartjes: '♥♥ / ✦✦✦'; met hartjes ervoor een scheidings-' / '
+const showLiveRepStars = computed(() => Boolean(props.showLiveRep && props.act.liveRep))
+const liveRepHasHearts = computed(() => Boolean(props.act.score) || props.act.status === 'suggested')
 </script>
 
 <template>
@@ -77,8 +71,8 @@ const liveRepSuffix = computed(() => {
         class="inline-flex items-center text-base leading-none"
         :class="{ 'group-hover/hearts:hidden': canEdit }"
       >
-        <span v-if="act.score" class="text-red-600" :title="`Onze hartjes: ${act.score}/3`">{{ '♥'.repeat(act.score) }}</span>
-        <span v-else-if="act.status === 'suggested'" title="Tip — nog geen hartjes">♡♡♡</span>
+        <HeartMarks v-if="act.score" :filled="act.score" size="size-3.5" :title="`Onze hartjes: ${act.score}/3`" />
+        <HeartMarks v-else-if="act.status === 'suggested'" tip size="size-3.5" title="Tip — nog geen hartjes" />
       </span>
 
       <!-- editor: drie klikbare hartjes (alleen in dev) -->
@@ -92,33 +86,45 @@ const liveRepSuffix = computed(() => {
           v-for="n in 3"
           :key="n"
           class="relative cursor-pointer px-px leading-none"
-          :class="heartSize"
           :title="act.score === n ? 'Klik nogmaals: hartjes weg' : HEART_LABELS[n]"
           @pointerenter="enterHeart($event, n)"
           @click="clickHeart(n)"
         >
-          <!-- hartje en X gestapeld; in de verwijder-hover draait het hartje weg
-               en de X erin, net als de tijdreis-knop -->
+          <!-- hartje en heart-off gestapeld; in de verwijder-hover faden ze in
+               elkaar over (beide zijn een hartje, dus geen draai) -->
+
           <span
             class="block transition-all duration-200 ease-out"
             :class="[
               filled(n) ? (removeHover ? 'text-black' : 'text-red-600') : 'text-black',
-              showX(n) ? 'rotate-90 scale-50 opacity-0' : 'rotate-0 scale-100 opacity-100'
+              showX(n) ? 'scale-90 opacity-0' : 'scale-100 opacity-100'
             ]"
-          >{{ filled(n) ? '♥' : '♡' }}</span>
+          ><svg
+            :class="xSize"
+            viewBox="0 0 24 24"
+            :fill="filled(n) ? 'currentColor' : 'none'"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          ><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" /></svg></span>
           <span
             class="absolute inset-0 flex items-center justify-center text-black transition-all duration-200 ease-out"
-            :class="showX(n) ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-50 opacity-0'"
+            :class="showX(n) ? 'scale-100 opacity-100' : 'scale-75 opacity-0'"
             aria-hidden="true"
-          ><UIcon name="i-lucide-x" :class="xSize" /></span>
+          ><UIcon name="i-lucide-heart-off" :class="xSize" /></span>
         </button>
       </span>
     </span>
 
     <span
-      v-if="liveRepSuffix"
-      class="text-sm font-bold leading-none"
+      v-if="showLiveRepStars"
+      class="inline-flex items-center text-sm font-bold leading-none"
       :title="`Reputatie: ${act.liveRep}/3`"
-    >{{ liveRepSuffix }}</span>
+    >
+      <span v-if="liveRepHasHearts" class="mx-1">/</span>
+      <StarMarks :count="act.liveRep ?? 0" size="size-3.5" />
+    </span>
   </span>
 </template>

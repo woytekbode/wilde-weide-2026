@@ -242,22 +242,23 @@ function blockStyle(act: Act) {
           >NU</span>
           <span
             v-if="act.status === 'suggested'"
-            class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-[11px] font-black"
+            class="flex size-4 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-[9px] font-black"
             title="Tip — nog geen hartjes"
           >?</span>
           <span
             v-if="conflictIds.has(act.id)"
-            class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-red-400 text-[11px] font-black"
+            class="flex size-4 items-center justify-center rounded-full border-2 border-black bg-red-400 text-[9px] font-black"
             title="Overlapt met een andere favoriet"
           >!</span>
         </span>
         <!-- ≤2 rijen: te laag voor losse regels, dus artiest en hartjes op één regel -->
         <div v-if="rowSpan(act) <= 2" class="flex items-baseline gap-1">
           <span class="min-w-0 truncate text-xs font-black leading-none">{{ act.artist }}</span>
-          <span class="shrink-0 text-[11px] leading-none">
-            <span v-if="act.score" class="text-red-600">{{ '♥'.repeat(act.score) }}</span>
-            <span v-else-if="act.status === 'suggested'">♡♡♡</span>
-            <span class="font-bold">{{ ((act.score || act.status === 'suggested') && act.liveRep) ? ' / ' : '' }}{{ '✦'.repeat(act.liveRep ?? 0) }}</span>
+          <span class="inline-flex shrink-0 items-center text-[11px] leading-none">
+            <HeartMarks v-if="act.score" :filled="act.score" size="size-2.5" />
+            <HeartMarks v-else-if="act.status === 'suggested'" tip size="size-2.5" />
+            <span v-if="(act.score || act.status === 'suggested') && act.liveRep" class="mx-0.5 font-bold">/</span>
+            <StarMarks v-if="act.liveRep" :count="act.liveRep" size="size-2.5" />
           </span>
         </div>
         <template v-else>
@@ -266,10 +267,11 @@ function blockStyle(act: Act) {
           <div class="mt-0.5 text-xs font-black leading-tight" :class="LINE_CLAMP[nameLines(act)]">{{ act.artist }}</div>
           <div v-if="rowSpan(act) >= 4 && act.style" class="truncate text-[10px] leading-tight">{{ act.style }}</div>
           <!-- ♥♥ / ✦✦; anders dan op de acts-pagina blijven de sterren ook bij ♥♥♥ staan -->
-          <div v-if="hasMarks(act)" class="text-[11px] leading-none">
-            <span v-if="act.score" class="text-red-600">{{ '♥'.repeat(act.score) }}</span>
-            <span v-else-if="act.status === 'suggested'">♡♡♡</span>
-            <span class="font-bold">{{ ((act.score || act.status === 'suggested') && act.liveRep) ? ' / ' : '' }}{{ '✦'.repeat(act.liveRep ?? 0) }}</span>
+          <div v-if="hasMarks(act)" class="inline-flex items-center text-[11px] leading-none">
+            <HeartMarks v-if="act.score" :filled="act.score" size="size-2.5" />
+            <HeartMarks v-else-if="act.status === 'suggested'" tip size="size-2.5" />
+            <span v-if="(act.score || act.status === 'suggested') && act.liveRep" class="mx-0.5 font-bold">/</span>
+            <StarMarks v-if="act.liveRep" :count="act.liveRep" size="size-2.5" />
           </div>
         </template>
       </button>
