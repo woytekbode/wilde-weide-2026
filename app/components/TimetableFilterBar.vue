@@ -28,7 +28,7 @@ const dayHiddenStages = computed(() => {
         :class="{ 'ww-btn-active': minScore === opt.value }"
         :title="opt.title"
         @click="minScore = opt.value"
-      ><HeartMarks v-if="opt.hearts" v-bind="opt.hearts" size="size-3.5" /><template v-else>{{ opt.label }}</template></button>
+      ><HeartMarks v-if="opt.hearts" v-bind="opt.hearts" size="size-3.5" inherit /><template v-else>{{ opt.label }}</template></button>
     </div>
 
     <!-- toon-stage-label + chips in één groep zodat het label mee naar een

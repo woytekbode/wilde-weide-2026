@@ -83,7 +83,7 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
           :class="{ 'ww-btn-active': filters.minScore === opt.value }"
           :title="opt.title"
           @click="filters.minScore = opt.value"
-        ><HeartMarks v-if="opt.hearts" v-bind="opt.hearts" size="size-3.5" /><template v-else>{{ opt.label }}</template></button>
+        ><HeartMarks v-if="opt.hearts" v-bind="opt.hearts" size="size-3.5" inherit /><template v-else>{{ opt.label }}</template></button>
       </div>
 
       <button

@@ -16,7 +16,10 @@ const props = withDefaults(defineProps<{
   tip?: boolean
   /** grootte-utility, bv. 'size-4' */
   size?: string
-}>(), { filled: 0, tip: false, size: 'size-4' })
+  /** erf currentColor i.p.v. rood/zwart — voor de filterknoppen (mee-inverteren
+   *  op hover, zwart op de actieve accentkleur) */
+  inherit?: boolean
+}>(), { filled: 0, tip: false, size: 'size-4', inherit: false })
 
 // Lucide 'heart'-pad; gevuld = fill currentColor, open = fill none
 const HEART_PATH = 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z'
@@ -28,7 +31,7 @@ const HEART_PATH = 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3
       <svg
         v-for="n in 3"
         :key="`tip-${n}`"
-        :class="[size, 'text-black']"
+        :class="[size, inherit ? '' : 'text-black']"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -42,7 +45,7 @@ const HEART_PATH = 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3
       <svg
         v-for="n in props.filled"
         :key="`fill-${n}`"
-        :class="[size, 'text-red-600']"
+        :class="[size, inherit ? '' : 'text-red-600']"
         viewBox="0 0 24 24"
         fill="currentColor"
         stroke="currentColor"
