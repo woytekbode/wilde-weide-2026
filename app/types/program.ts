@@ -52,7 +52,8 @@ export interface Act extends SourceAct {
   id: string
   /** uit welk programma deze act komt (muziek of sfeermakers) */
   programme: Programme
-  dayKey: DayKey
+  /** null = sfeermaker zonder vast tijdslot/plek (timeless), staat in geen enkel dagschema */
+  dayKey: DayKey | null
   dayLabel: string
   dayDate: string
   /** minuten sinds 00:00 van de festivaldag; na middernacht > 1440 */
@@ -61,6 +62,8 @@ export interface Act extends SourceAct {
   /** groepsscore 1-3 (hartjes), null = geen score; komt uit KV, niet uit de JSON */
   score: number | null
   status: ActStatus
+  /** sfeermaker zonder tijd/plek: geen dag-/tijdpil, niet in het blokkenschema */
+  timeless?: boolean
 }
 
 export interface Conflict {

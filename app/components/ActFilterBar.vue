@@ -1,9 +1,25 @@
 <script setup lang="ts">
 import { actTimeStatus, DAY_META, SCORE_OPTIONS } from '~/data/display'
+import type { Programme } from '~/types/program'
 
-const { filters, reset } = useFilters()
-const { festival, acts } = useActs()
+const props = withDefaults(defineProps<{ programme?: Programme }>(), { programme: 'muziek' })
+
+const { filters, reset } = useFilters(props.programme)
+const { festival, acts } = useProgramme(props.programme)
 const now = useNow()
+
+// programmawissel (muziek of sfeermakers); gedeelde state met de pagina en het blokkenschema
+const programme = useState<Programme>('programme', () => 'muziek')
+const PROGRAMMES: { value: Programme, label: string }[] = [
+  { value: 'muziek', label: 'Muziek' },
+  { value: 'sfeermakers', label: 'Sfeermakers' }
+]
+
+// sfeermakers gebruikt `categories` i.p.v. `genres` als brede filter-bucket
+const genreItems = computed<string[]>(() => {
+  const f = festival as unknown as { genres?: string[], categories?: string[] }
+  return f.genres ?? f.categories ?? []
+})
 
 // pas relevant zodra er daadwerkelijk iets afgelopen is (tijdens het weekend)
 const anyPast = computed(() => now.value !== null && acts.value.some(a => actTimeStatus(a, now.value) === 'past'))
@@ -36,11 +52,11 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
       />
       <USelectMenu
         v-model="filters.genres"
-        :items="festival.genres"
+        :items="genreItems"
         :search-input="false"
         :portal="false"
         multiple
-        placeholder="alle genres"
+        :placeholder="programme === 'sfeermakers' ? 'alle categorieën' : 'alle genres'"
         class="w-40"
       />
       <USelectMenu
@@ -53,6 +69,18 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
         class="w-36"
       />
       <button class="ww-btn py-0.5! text-sm" @click="reset()">wis filters</button>
+
+      <!-- programmawissel; zelfde chip-stijl, rechts op desktop (sm:ml-auto),
+           links uitgelijnd bij wrappen op telefoon -->
+      <div class="flex items-center gap-2 sm:ml-auto">
+        <button
+          v-for="p in PROGRAMMES"
+          :key="p.value"
+          class="ww-btn py-0.5! text-sm max-sm:px-2!"
+          :class="{ 'ww-btn-active': programme === p.value }"
+          @click="programme = p.value"
+        >{{ p.label }}</button>
+      </div>
     </div>
 
     <div class="flex flex-wrap items-center gap-2 text-sm">

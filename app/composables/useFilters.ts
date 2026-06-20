@@ -1,4 +1,4 @@
-import type { Act, DayKey } from '~/types/program'
+import type { Act, DayKey, Programme } from '~/types/program'
 import { actTimeStatus } from '~/data/display'
 
 export interface ActFilters {
@@ -30,9 +30,13 @@ const defaultFilters = (): ActFilters => ({
   hideFinished: false
 })
 
-/** Gedeelde filterstatus voor tabel- en acts-weergave */
-export function useFilters() {
-  const filters = useState<ActFilters>('act-filters', defaultFilters)
+/**
+ * Gedeelde filterstatus voor tabel- en acts-weergave. Per programma een eigen
+ * state-sleutel: muziek en sfeermakers hebben een ander vocabulaire (podia,
+ * genres/categorieën, types), dus hun selecties mogen elkaar niet vervuilen.
+ */
+export function useFilters(programme: Programme = 'muziek') {
+  const filters = useState<ActFilters>(`act-filters-${programme}`, defaultFilters)
   const now = useNow()
 
   function reset() {
@@ -57,9 +61,9 @@ export function useFilters() {
   return { filters, reset, matches }
 }
 
-export function useFilteredActs() {
-  const { acts } = useActs()
-  const { filters, matches } = useFilters()
+export function useFilteredActs(programme: Programme = 'muziek') {
+  const { acts } = useProgramme(programme)
+  const { filters, matches } = useFilters(programme)
   return computed(() => {
     // touch zodat de computed op alle filtervelden reageert
     void filters.value

@@ -26,7 +26,8 @@
       "host": "Overkoepelende sfeermaker of hosting-locatie uit wildeweide-sfeermakers.json; meestal gelijk aan stage, behalve bij de Verwilderij (\"De Verwilderij Natuursafari's\").",
       "type": "Type van de activiteit; op Wilde Weide staan alle items als Sfeermaker.",
       "category": "Soort activiteit, gekozen uit festival.categories (de activiteiten-tegenhanger van genre in het muziekprogramma).",
-      "description": "Korte uitleg van wat de activiteit zelf inhoudt."
+      "description": "Korte uitleg van wat de activiteit zelf inhoudt.",
+      "unscheduled": "Sfeermakers zonder vast tijdslot/plek; ontbrekende velden (time, start, end, stage, category) zijn null en worden in de webapp afgehandeld."
     },
     "categories": [
       "Yoga, beweging & dans",
@@ -1295,6 +1296,173 @@
           "description": "Absurd casinospel waarin je inzet op kakkerlakken in plaats van een roulettewiel."
         }
       ]
+    }
+  ],
+  "unscheduled": [
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Absolut Cocktail Bar",
+      "host": "Absolut Cocktail Bar",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Bij dit kunstwerk van Uitvindersgilde komen je ogen en smaakpapillen niks tekort. Met een cocktail in de hand komt alles goed."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Ambrosia",
+      "host": "Ambrosia",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Stap in deze energietornado, voor je het weet sta je te bewegen zonder plan op Afrikaanse ritmes en moderne rave."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Chill & Tril",
+      "host": "Chill & Tril",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Zak diep weg in een interactief kunstproject van Parker. Een trillende hangmat voor een ervaring van frequenties van teen tot kruin. Perfect voor de vermoeide speakerfreaker die even wil opladen."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Groepsdouche",
+      "host": "Groepsdouche",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Vaste prik op Wilde Weide en Wildeburg. Samen dansen, samen douchen."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Hottubberdiedub",
+      "host": "Hottubberdiedub",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Heet, heter, heetst: glij de hottub in en dompel in een warm bad."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Hour House",
+      "host": "Hour House",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Neus tussen de vintage schatten en ontdek parels die wachten op een nieuw leven."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "HutjeMutje",
+      "host": "HutjeMutje",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Zoals de naam al doet vermoeden vier je in deze hut het grootste feest op de minste vierkante meters."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "IJsbaden",
+      "host": "IJsbaden",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Zet jezelf extra fris en begin je dag met een ijsbad."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "InnerSound Sessies",
+      "host": "InnerSound Sessies",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Laat je spieren sudderen met de geluidsgolven van Inner Sound BuZz. Ervaar de innerlijke belevingsreis op een unieke manier van diepe lounge tot energieke Immersive Disco."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Klaverjasvereeniging Slagvaardig",
+      "host": "Klaverjasvereeniging Slagvaardig",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Voor hen die rijp genoeg is om een kaartje te leggen: wacht niet tot je pensioen! Klaverjasvereeniging Slagvaardig is naarstig op zoek naar nieuwe leden en biedt voldoende toernooien, met en zonder prijzen."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Kunstroute",
+      "host": "Kunstroute",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Verspreid over het hele terrein vind je talloze sculpturen, installaties en (interactieve) objecten van allerlei materialen en disciplines. Met werk van o.a. ATMosphere, Bananas, Beeldjutters, Dimitri Modderman, en meer."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Kuuma Sauna area",
+      "host": "Kuuma Sauna area",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Wees lief voor je lijf: pak een Kuuma saunasessie mee bij onze saunameesters voor een verdiende reset."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Mooie Bieren Tuin",
+      "host": "Mooie Bieren Tuin",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Met een tap vol trots gebrouwen bieren is dit de plek voor natgierige gasten die even goed willen genieten."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Spikkeltjesbos",
+      "host": "Spikkeltjesbos",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Ladingen laserlichtjes van DM lasers die de takken en wortels tot leven brengen. 100% tripgarantie zonder trippen."
+    },
+    {
+      "time": null,
+      "start": null,
+      "end": null,
+      "stage": null,
+      "artist": "Vliering",
+      "host": "Vliering",
+      "type": "Sfeermaker",
+      "category": null,
+      "description": "Pak de tijd om je eigen tenue te bedrukken bij de zeefdruktruck van Studio Vliering. Met verschillende ramen met de doorvertaling van de Wilde Weide wereld."
     }
   ],
   "hosts": [

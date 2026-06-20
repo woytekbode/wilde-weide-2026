@@ -2,8 +2,8 @@
  * Gedeelde tentlocatie per groep. Iedereen in dezelfde groep ziet dezelfde
  * tent: de coördinaat (fractie 0..1 van de plattegrond) leeft in KV onder
  * tent:<slug> — in dev de Nitro-mock, live de worker. Zelfde optimistische
- * patroon als useSfeer/useScoring: de UI verandert direct, bij een fout rollen
- * we terug. Het laden gebeurt in plugins/groep.client.ts naast scores/sfeer.
+ * patroon als useScoring: de UI verandert direct, bij een fout rollen we terug.
+ * Het laden gebeurt in plugins/groep.client.ts naast de scores.
  */
 export interface TentPos {
   fx: number

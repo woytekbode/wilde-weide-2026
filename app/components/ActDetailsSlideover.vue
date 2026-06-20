@@ -40,10 +40,11 @@ const metaLine = computed(() =>
 
           <div class="flex flex-wrap items-center gap-2 text-sm font-bold">
             <span
+              v-if="!act.timeless"
               class="rounded-full border-2 border-black px-2 py-0.5 text-xs"
               :class="dayMeta?.accentSoft"
             >{{ dayMeta?.label }} · {{ act.time }}</span>
-            <StageBadge :stage="act.stage" :programme="act.programme" />
+            <StageBadge v-if="act.stage" :stage="act.stage" :programme="act.programme" />
             <span v-if="act.genre" class="rounded-full border-2 border-black px-2 py-0.5 text-xs" :class="genreColor(act.genre, act.programme)">
               {{ act.genre }}
             </span>

@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { actTimeStatus, DAY_META, genreColor } from '~/data/display'
-import type { Act } from '~/types/program'
+import type { Act, Programme } from '~/types/program'
 
 definePageMeta({ wwBg: 'oker' })
 
-const filteredActs = useFilteredActs()
-const { conflictActIds } = useActs()
+// muziek- of sfeermaker-programma; gedeelde state met het blokkenschema en de filterbalk
+const programme = useState<Programme>('programme', () => 'muziek')
+
+// beide programma's vooraf opbouwen en reactief omschakelen, zodat de toggle
+// in de filterbalk de lijst meteen ververst (geen remount/navigatie nodig)
+const musicFiltered = useFilteredActs('muziek')
+const sfeerFiltered = useFilteredActs('sfeermakers')
+const filteredActs = computed(() => programme.value === 'sfeermakers' ? sfeerFiltered.value : musicFiltered.value)
+
+const musicProg = useProgramme('muziek')
+const sfeerProg = useProgramme('sfeermakers')
 const { show } = useActDetails()
 const now = useNow()
 
@@ -13,6 +22,7 @@ const now = useNow()
 // maar hier samengevoegd over alle dagen omdat de acts-lijst niet per dag splitst
 const CONFLICT_MIN_SCORE = 2
 const conflictIds = computed(() => {
+  const conflictActIds = (programme.value === 'sfeermakers' ? sfeerProg : musicProg).conflictActIds
   const ids = new Set<string>()
   for (const d of DAY_META) {
     for (const id of conflictActIds(d.key, CONFLICT_MIN_SCORE, false)) ids.add(id)
@@ -31,7 +41,7 @@ function dayAccent(act: Act): string {
 
 <template>
   <div class="space-y-4">
-    <ActFilterBar />
+    <ActFilterBar :key="programme" :programme="programme" />
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <button
@@ -41,7 +51,7 @@ function dayAccent(act: Act): string {
         :class="[
           // schaduw schaalt met de score: 3 hartjes 6px, 2 hartjes 3px, rest vlak
           act.score === 3 ? 'shadow-[6px_6px_0_0_#000]!' : act.score === 2 ? 'shadow-[3px_3px_0_0_#000]!' : 'shadow-none!',
-          actTimeStatus(act, now) === 'past' ? 'opacity-40 grayscale' : ''
+          !act.timeless && actTimeStatus(act, now) === 'past' ? 'opacity-40 grayscale' : ''
         ]"
         @click="show(act)"
       >
@@ -60,19 +70,23 @@ function dayAccent(act: Act): string {
         </span>
         <div class="mb-1.5 flex flex-wrap items-center gap-1.5 text-xs font-bold">
           <span
-            v-if="actTimeStatus(act, now) === 'now'"
+            v-if="!act.timeless && actTimeStatus(act, now) === 'now'"
             class="rounded-full border-2 border-black bg-black px-1.5 py-0.5 text-[10px] font-black text-white"
           >NU</span>
-          <span class="rounded-full border-2 border-black px-1.5 text-[10px] font-mono" :class="dayAccent(act)">
+          <span v-if="!act.timeless" class="rounded-full border-2 border-black px-1.5 text-[10px] font-mono" :class="dayAccent(act)">
             {{ dayShort(act) }} {{ act.time }}
           </span>
-          <StageBadge :stage="act.stage" size="xs" />
-          <span v-if="act.genre" class="rounded-full border-2 border-black px-1.5 text-[10px]" :class="genreColor(act.genre)">
+          <!-- sfeermaker zonder tijd/plek: toon het type i.p.v. de lege tijd-/podiumpil -->
+          <span v-if="act.timeless && act.type" class="rounded-full border-2 border-black bg-veld-300 px-1.5 text-[10px]">
+            {{ act.type }}
+          </span>
+          <StageBadge v-if="act.stage" :stage="act.stage" :programme="act.programme" size="xs" />
+          <span v-if="act.genre" class="rounded-full border-2 border-black px-1.5 text-[10px]" :class="genreColor(act.genre, act.programme)">
             {{ act.genre }}
           </span>
         </div>
         <h3 class="font-display text-xl font-black leading-tight">{{ act.artist }}</h3>
-        <div class="mt-0.5 text-xs font-bold text-stone-600">{{ act.style }}</div>
+        <div v-if="act.style" class="mt-0.5 text-xs font-bold text-stone-600">{{ act.style }}</div>
         <div class="mt-0.5 flex">
           <HeartScore :act="act" show-live-rep />
         </div>
@@ -80,6 +94,6 @@ function dayAccent(act: Act): string {
       </button>
     </div>
 
-    <p class="text-sm font-bold">{{ filteredActs.length }} artiesten</p>
+    <p class="text-sm font-bold">{{ filteredActs.length }} {{ programme === 'sfeermakers' ? 'sfeermakers' : 'artiesten' }}</p>
   </div>
 </template>

@@ -19,9 +19,22 @@ interface SfeerSourceAct {
   category: string
   description: string | null
 }
+/** sfeermaker zonder vast tijdslot/plek: zelfde vorm, maar tijd/plek/categorie zijn null */
+interface SfeerUnscheduled {
+  artist: string
+  host: string | null
+  type: string | null
+  category: string | null
+  description: string | null
+  time: string | null
+  start: string | null
+  end: string | null
+  stage: string | null
+}
 interface SfeerProgram {
   festival: Omit<Program['festival'], 'genres'> & { categories: string[] }
   days: { day: string, date: string, acts: SfeerSourceAct[] }[]
+  unscheduled?: SfeerUnscheduled[]
 }
 const typedSfeer = sfeerProgram as unknown as SfeerProgram
 
@@ -83,13 +96,50 @@ export function buildActs(): Act[] {
   return assemble(typedMusic.days, 'muziek', '')
 }
 
+/**
+ * Sfeermakers zonder tijd/plek (cocktailbar, sauna, …): timeless Acts met
+ * dayKey null, dus ze vallen buiten elk dagschema (actsForDay) en de
+ * conflictdetectie, maar verschijnen wél als kaart op de acts-pagina. Niet via
+ * assemble(): die rekent startMin uit `start` en leidt een dayKey af.
+ */
+function buildUnscheduledSfeerActs(): Act[] {
+  return (typedSfeer.unscheduled ?? []).map(s => ({
+    id: `sfeermaker-${slugify(s.artist)}`,
+    programme: 'sfeermakers',
+    artist: s.artist,
+    type: s.type,
+    description: s.description,
+    // zelf-host weglaten zodat de slideover geen 'onderdeel van <zichzelf>' toont
+    host: null,
+    genre: null,
+    style: null,
+    liveRep: null,
+    liveImpression: null,
+    country: null,
+    curator: null,
+    spotify: null,
+    time: '',
+    start: '',
+    end: '',
+    stage: '',
+    dayKey: null,
+    dayLabel: '',
+    dayDate: '',
+    startMin: 0,
+    endMin: 0,
+    score: null,
+    status: 'unscored',
+    timeless: true
+  }))
+}
+
 export function buildSfeerActs(): Act[] {
   const days: SourceDay[] = typedSfeer.days.map(d => ({
     day: d.day,
     date: d.date,
     acts: d.acts.map(sfeerToSource)
   }))
-  return assemble(days, 'sfeermakers', 'sfeermaker-')
+  return [...assemble(days, 'sfeermakers', 'sfeermaker-'), ...buildUnscheduledSfeerActs()]
 }
 
 interface Dataset {
