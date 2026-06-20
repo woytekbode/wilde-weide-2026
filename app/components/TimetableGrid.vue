@@ -202,7 +202,7 @@ function blockStyle(act: Act) {
            2px rowGap binnen de span wegvalt en er bij horizontaal scrollen geen
            tegels door gaten heen schemeren; sticky houdt 'm links vast -->
       <div
-        class="sticky left-0 z-10 transition-colors duration-300"
+        class="sticky left-0 z-10 transition-colors duration-500"
         :style="{ gridColumn: '1', gridRow: `2 / span ${slotCount}`, backgroundColor: 'var(--ww-accent)' }"
       />
 

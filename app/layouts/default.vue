@@ -57,7 +57,7 @@ useHead({
 
 <template>
   <div
-    class="min-h-screen pb-24 transition-colors duration-300 lg:pb-10"
+    class="min-h-screen pb-24 transition-colors duration-500 lg:pb-10"
     :class="BG_CLASSES[pageColor]"
     :style="{ '--ww-accent': ACCENT_VARS[pageColor] }"
   >
