@@ -48,7 +48,7 @@ watch(programme, () => {
            springt naar een willekeurig moment in het weekend en bevriest de klok -->
       <button
         type="button"
-        class="ww-nav-btn group ml-auto px-3!"
+        class="ww-nav-btn group ml-auto size-10 shrink-0 justify-center self-center px-0!"
         :class="{ 'ww-nav-btn-active': frozen }"
         :aria-label="frozen ? 'Tijdreizen stoppen' : 'Tijdreizen: spring naar een willekeurig moment in het weekend'"
         :title="frozen ? 'Tijdreizen stoppen' : 'Tijdreizen: spring naar een willekeurig moment in het weekend'"
@@ -75,7 +75,7 @@ watch(programme, () => {
       <!-- heropent de uitleg-/legenda-modal -->
       <button
         type="button"
-        class="ww-nav-btn"
+        class="ww-nav-btn size-10 shrink-0 justify-center self-center px-0!"
         :class="{ 'ww-nav-btn-active': legendOpen }"
         aria-label="Uitleg"
         title="Snap je er niks van?"
