@@ -11,6 +11,10 @@ const now = useNow()
 function dayShort(act: Act): string {
   return DAY_META.find(d => d.key === act.dayKey)?.shortLabel ?? ''
 }
+
+function dayAccent(act: Act): string {
+  return DAY_META.find(d => d.key === act.dayKey)?.accentSoft ?? ''
+}
 </script>
 
 <template>
@@ -39,7 +43,7 @@ function dayShort(act: Act): string {
             v-if="actTimeStatus(act, now) === 'now'"
             class="rounded-full border-2 border-black bg-black px-1.5 py-0.5 text-[10px] font-black text-white"
           >NU</span>
-          <span class="rounded-full border-2 border-black bg-stone-100 px-2 py-0.5 font-mono">
+          <span class="rounded-full border-2 border-black px-1.5 text-[10px] font-mono" :class="dayAccent(act)">
             {{ dayShort(act) }} {{ act.time }}
           </span>
           <StageBadge :stage="act.stage" size="xs" />
