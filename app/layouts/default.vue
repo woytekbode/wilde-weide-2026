@@ -61,39 +61,44 @@ useHead({
     :class="BG_CLASSES[pageColor]"
     :style="{ '--ww-accent': ACCENT_VARS[pageColor] }"
   >
-    <header class="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 pt-5 pb-4 lg:px-8">
-      <div>
-        <NuxtLink :to="groep ? `/groep/${groep}` : '/'" class="block">
-          <h1 class="font-display text-4xl font-black leading-none tracking-tight lg:text-5xl">
-            Wilde Weide 2026
-          </h1>
-        </NuxtLink>
-        <h2 class="font-display text-3xl font-black leading-tight">🌿 Vriendenplek 🌿</h2>
-        <div class="mt-1 text-sm font-bold">
-          <!-- groepsnaam + scheidingsstip alleen tonen als er een groep gekozen
-               is; op de groepsnaam-invoerpagina begint de subtitel meteen bij de
-               datum -->
-          <template v-if="groep">
-            <NuxtLink
-              :to="kiesGroepLink"
-              class="underline decoration-2 underline-offset-2"
-            >{{ groepNaam || groep }}</NuxtLink> ·
-          </template>
-          3.4.5 juli 2026 · Netl de Wildste Tuin<span class="hidden sm:inline">, Kraggenburg</span>
+    <header class="mx-auto max-w-7xl px-4 pt-5 pb-4 lg:px-8">
+      <!-- titelrij + nav delen één regel en lijnen onderaan uit; de pilhoogte
+           valt samen met de teksthoogte, dus de bovenkanten lopen ook gelijk -->
+      <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
+          <NuxtLink :to="groep ? `/groep/${groep}` : '/'" class="block">
+            <h1 class="font-display text-4xl font-black leading-none tracking-tight lg:text-5xl">
+              Wilde Weide 2026
+            </h1>
+          </NuxtLink>
+          <h2 class="font-display text-xl font-black leading-none lg:text-2xl"><span class="align-bottom text-sm lg:text-base">🌿</span> Vriendenplek <span class="align-bottom text-sm lg:text-base">🌿</span></h2>
         </div>
+
+        <nav v-if="groep" class="hidden gap-2 lg:flex">
+          <NuxtLink
+            v-for="item in nav"
+            :key="item.to"
+            :to="item.to"
+            class="ww-nav-btn"
+            :class="{ 'ww-nav-btn-active': route.path === item.to }"
+          >
+            {{ item.label }}
+          </NuxtLink>
+        </nav>
       </div>
 
-      <nav v-if="groep" class="hidden gap-2 lg:flex">
-        <NuxtLink
-          v-for="item in nav"
-          :key="item.to"
-          :to="item.to"
-          class="ww-nav-btn"
-          :class="{ 'ww-nav-btn-active': route.path === item.to }"
-        >
-          {{ item.label }}
-        </NuxtLink>
-      </nav>
+      <div class="mt-1 text-sm font-bold">
+        <!-- groepsnaam + scheidingsstip alleen tonen als er een groep gekozen
+             is; op de groepsnaam-invoerpagina begint de subtitel meteen bij de
+             datum -->
+        <template v-if="groep">
+          <NuxtLink
+            :to="kiesGroepLink"
+            class="underline decoration-2 underline-offset-2"
+          >{{ groepNaam || groep }}</NuxtLink> ·
+        </template>
+        3.4.5 juli 2026 · Netl de Wildste Tuin<span class="hidden sm:inline">, Kraggenburg</span>
+      </div>
     </header>
 
     <main class="mx-auto max-w-7xl px-4 lg:px-8">
