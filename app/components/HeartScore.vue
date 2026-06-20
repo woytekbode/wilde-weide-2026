@@ -63,7 +63,7 @@ const liveRepHasHearts = computed(() => Boolean(props.act.score) || props.act.st
 </script>
 
 <template>
-  <span class="inline-flex items-center gap-1" @click.stop>
+  <span class="inline-flex items-center" @click.stop>
     <span class="group/hearts relative inline-flex items-center">
       <!-- compacte weergave; verdwijnt op hover als er een editor is -->
       <span
