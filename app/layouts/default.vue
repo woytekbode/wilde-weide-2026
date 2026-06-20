@@ -10,10 +10,10 @@ const kiesGroepLink = `/?${GROEPSWISSEL_QUERY}`
 const nav = computed(() => {
   const base = `/groep/${groep.value}`
   return [
-    { to: base, label: 'Schema', icon: 'i-lucide-layout-template' },
+    { to: base, label: 'Programma', icon: 'i-lucide-layout-template' },
     // Tabel-pagina blijft bestaan (/tabel werkt nog), maar staat bewust niet in de nav
     // { to: `${base}/tabel`, label: 'Tabel', icon: 'i-lucide-table' },
-    { to: `${base}/artiesten`, label: 'Artiesten', icon: 'i-lucide-layout-grid' },
+    { to: `${base}/ontdekken`, label: 'Ontdekken', icon: 'i-lucide-layout-grid' },
     { to: `${base}/podia`, label: 'Podia', icon: 'i-lucide-ship' },
     { to: `${base}/kaart`, label: 'Kaart', icon: 'i-lucide-map' }
   ]

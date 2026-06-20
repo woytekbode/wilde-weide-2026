@@ -1,6 +1,6 @@
 import { GROEP_LS_KEY, GROEPSWISSEL_QUERY, isGeldigeGroepSlug } from '#shared/groep'
 
-const LEGACY_PADEN = ['/tabel', '/artiesten', '/podia']
+const LEGACY_PADEN = ['/tabel', '/ontdekken', '/podia']
 
 /**
  * Routing rond groepen: oude deep links zonder groep doorsturen naar de
@@ -17,10 +17,14 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo({ path: to.path.replace(/\/+$/, ''), query: to.query }, { replace: true })
   }
 
-  // De Sfeer-pagina is opgegaan in Artiesten (sfeermakers-modus): oude links
-  // (zowel /groep/<slug>/sfeer als de bare /sfeer deep link) → /artiesten
+  // De Sfeer-pagina is opgegaan in Ontdekken (sfeermakers-modus): oude links
+  // (zowel /groep/<slug>/sfeer als de bare /sfeer deep link) → /ontdekken.
+  // Idem voor de oude /artiesten-naam.
   if (to.path === '/sfeer' || to.path.endsWith('/sfeer')) {
-    return navigateTo({ path: to.path.replace(/\/sfeer$/, '/artiesten'), query: to.query }, { replace: true })
+    return navigateTo({ path: to.path.replace(/\/sfeer$/, '/ontdekken'), query: to.query }, { replace: true })
+  }
+  if (to.path === '/artiesten' || to.path.endsWith('/artiesten')) {
+    return navigateTo({ path: to.path.replace(/\/artiesten$/, '/ontdekken'), query: to.query }, { replace: true })
   }
 
   const slug = typeof to.params.groep === 'string' ? to.params.groep : undefined
