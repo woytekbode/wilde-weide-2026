@@ -11,7 +11,8 @@
       "Lun-air",
       "Verwilderij (Buiten)",
       "Verwilderij (Vuurplek)",
-      "Verwilderij (Ger)"
+      "Verwilderij (Ger)",
+      "Camping"
     ],
     "types": [
       "Sfeermaker"
@@ -39,6 +40,23 @@
     ]
   },
   "days": [
+    {
+      "day": "Donderdag 2 juli 2026",
+      "date": "2026-07-02",
+      "acts": [
+        {
+          "time": "15:00-22:00",
+          "start": "2026-07-02T15:00:00",
+          "end": "2026-07-02T22:00:00",
+          "stage": "Camping",
+          "artist": "Dwaaltocht",
+          "host": "Dwaaltocht",
+          "type": "Sfeermaker",
+          "category": "Spel & toernooi",
+          "description": "Volg de aanwijzingen en ga op dwaaltocht. Ontrafel de geheimen van Wilde Weide en wordt rijkelijk beloond."
+        }
+      ]
+    },
     {
       "day": "Vrijdag 3 juli 2026",
       "date": "2026-07-03",
@@ -1309,6 +1327,11 @@
       "name": "De Verwilderij Natuursafari's",
       "type": "Sfeermaker",
       "description": "Sprokkel ingrediënten voor je antikatersoep bij elkaar en breng een bezoekje aan de bijen tijdens deze wildplukwandeling."
+    },
+    {
+      "name": "Dwaaltocht",
+      "type": "Sfeermaker",
+      "description": "Volg de aanwijzingen en ga op dwaaltocht. Ontrafel de geheimen van Wilde Weide en wordt rijkelijk beloond."
     }
   ]
 }

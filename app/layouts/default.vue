@@ -68,6 +68,7 @@ useHead({
             Wilde Weide 2026
           </h1>
         </NuxtLink>
+        <h2 class="font-display text-3xl font-black leading-tight">🌿 Vriendenplek 🌿</h2>
         <div class="mt-1 text-sm font-bold">
           <!-- groepsnaam + scheidingsstip alleen tonen als er een groep gekozen
                is; op de groepsnaam-invoerpagina begint de subtitel meteen bij de
