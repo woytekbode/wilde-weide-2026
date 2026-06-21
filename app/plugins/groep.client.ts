@@ -1,4 +1,3 @@
-import type { Act } from '~/types/program'
 import type { GroepScoreMap, GroepTent } from '#shared/groep'
 import { buildActs, buildSfeerActs, useProgramme } from '~/composables/useActs'
 
@@ -14,8 +13,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const { acts: sfeerActs } = useProgramme('sfeermakers')
   const { tent: tentPos } = useTent()
   const { groepNaam, rememberGroep, forgetGroep } = useGroep()
-  const detailsAct = useState<Act | null>('act-details', () => null)
-  const detailsOpen = useState<boolean>('act-details-open', () => false)
   const toast = useToast()
 
   // bij snel wisselen telt alleen de laatst gestarte load
@@ -24,9 +21,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   async function laadGroep(slug: string) {
     const token = ++laadToken
 
-    // schone lei: neutrale data en geen slideover met een oude Act-ref
-    detailsAct.value = null
-    detailsOpen.value = false
+    // schone lei: neutrale data. De slideover leidt zichzelf af uit ?act +
+    // de (zo dadelijk herbouwde) acts, dus die hoeft hier niet gereset.
     acts.value = buildActs()
     sfeerActs.value = buildSfeerActs()
     tentPos.value = null

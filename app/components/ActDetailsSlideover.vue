@@ -44,6 +44,21 @@ const curatorLine = computed(() => {
 const metaLine = computed(() =>
   [act.value?.style, act.value?.type, act.value?.country].filter(Boolean).join(' · ')
 )
+
+// deelbare link kopiëren: de URL bevat al ?act=<id> zolang de slideover open is
+const copied = ref(false)
+let copiedTimer: ReturnType<typeof setTimeout> | undefined
+async function copyLink() {
+  try {
+    await navigator.clipboard.writeText(window.location.href)
+    copied.value = true
+    clearTimeout(copiedTimer)
+    copiedTimer = setTimeout(() => (copied.value = false), 1500)
+  }
+  catch {
+    // clipboard geweigerd (geen https/permission): stil laten
+  }
+}
 </script>
 
 <template>
@@ -118,13 +133,25 @@ const metaLine = computed(() =>
             {{ act.liveImpression }}
           </div>
 
-          <a
-            v-if="act.spotify"
-            :href="act.spotify"
-            target="_blank"
-            rel="noopener"
-            class="ww-btn-solid"
-          >▶ Luister op Spotify</a>
+          <div class="flex flex-wrap items-center gap-2">
+            <a
+              v-if="act.spotify"
+              :href="act.spotify"
+              target="_blank"
+              rel="noopener"
+              class="ww-btn-solid"
+            >▶ Luister op Spotify</a>
+            <!-- compacte icoonknop: past altijd naast Spotify en verspringt niet
+                 bij het wisselen; de check bevestigt het kopiëren -->
+            <button
+              class="ww-btn-solid shrink-0 px-3!"
+              :title="copied ? 'Link gekopieerd' : 'Kopieer link'"
+              :aria-label="copied ? 'Link gekopieerd' : 'Kopieer link'"
+              @click="copyLink"
+            >
+              <UIcon :name="copied ? 'i-lucide-check' : 'i-lucide-link'" class="size-5" />
+            </button>
+          </div>
         </div>
       </div>
     </template>
