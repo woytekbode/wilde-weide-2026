@@ -75,9 +75,13 @@ function assemble(days: SourceDay[], programme: Programme, idPrefix: string): Ac
     for (const src of day.acts) {
       const startMin = (new Date(src.start).getTime() - midnight) / 60000
       const endMin = (new Date(src.end).getTime() - midnight) / 60000
+      const id = `${idPrefix}${dayKey}-${slugify(src.artist)}-${src.start.slice(11, 16)}`
       acts.push({
         ...src,
-        id: `${idPrefix}${dayKey}-${slugify(src.artist)}-${src.start.slice(11, 16)}`,
+        id,
+        // sfeermaker-activiteiten komen vaak op meerdere tijdstippen terug; één
+        // score per activiteit (i.p.v. per tijdslot) via een activiteit-sleutel
+        scoreKey: programme === 'sfeermakers' ? `sfeermaker-${slugify(src.artist)}` : id,
         programme,
         dayKey,
         dayLabel: day.day,
@@ -105,6 +109,7 @@ export function buildActs(): Act[] {
 function buildUnscheduledSfeerActs(): Act[] {
   return (typedSfeer.unscheduled ?? []).map(s => ({
     id: `sfeermaker-${slugify(s.artist)}`,
+    scoreKey: `sfeermaker-${slugify(s.artist)}`,
     programme: 'sfeermakers',
     artist: s.artist,
     type: s.type,

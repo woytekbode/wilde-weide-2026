@@ -8,41 +8,46 @@ import type { Act } from '~/types/program'
 export function useScoring() {
   const canEdit = true
   const { groep } = useGroep()
+  const { acts: musicActs } = useProgramme('muziek')
+  const { acts: sfeerActs } = useProgramme('sfeermakers')
 
-  async function setScore(act: Act, score: number) {
-    if (act.score === score) return
-    const previous = { score: act.score, status: act.status }
-    act.score = score
-    act.status = 'scored'
+  /**
+   * Alle acts die dezelfde scoreKey delen binnen het programma van `act`. Voor
+   * muziek is dat de act zelf; sfeermaker-activiteiten komen op meerdere
+   * tijdstippen terug, dus één score moet op al die sessies doorwerken.
+   */
+  function siblings(act: Act): Act[] {
+    const arr = act.programme === 'sfeermakers' ? sfeerActs.value : musicActs.value
+    return arr.filter(a => a.scoreKey === act.scoreKey)
+  }
+
+  async function persist(act: Act, body: { score?: number, suggested?: boolean }, apply: (a: Act) => void) {
+    const group = siblings(act)
+    const previous = group.map(a => ({ a, score: a.score, status: a.status }))
+    for (const a of group) apply(a)
     try {
       await $fetch(`/api/groep/${groep.value}/scores`, {
         method: 'POST',
-        body: { id: act.id, score }
+        body: { id: act.scoreKey, ...body }
       })
     } catch (err) {
-      act.score = previous.score
-      act.status = previous.status
+      for (const p of previous) { p.a.score = p.score; p.a.status = p.status }
       console.error('score opslaan mislukt', err)
-      useToast().add({ title: 'Score opslaan mislukt', color: 'error' })
+      useToast().add({ title: 'Opslaan mislukt', color: 'error' })
     }
+  }
+
+  async function setScore(act: Act, score: number) {
+    if (act.score === score) return
+    await persist(act, { score }, (a) => { a.score = score; a.status = 'scored' })
   }
 
   /** markeert een act als suggestie (?) of haalt die markering weg */
   async function setSuggested(act: Act, suggested: boolean) {
-    const previous = { score: act.score, status: act.status }
-    act.score = null
-    act.status = suggested ? 'suggested' : 'unscored'
-    try {
-      await $fetch(`/api/groep/${groep.value}/scores`, {
-        method: 'POST',
-        body: { id: act.id, suggested }
-      })
-    } catch (err) {
-      act.score = previous.score
-      act.status = previous.status
-      console.error('suggestie opslaan mislukt', err)
-      useToast().add({ title: 'Suggestie opslaan mislukt', color: 'error' })
-    }
+    await persist(act, { suggested }, (a) => {
+      a.score = null
+      a.status = suggested ? 'suggested' : 'unscored'
+    })
   }
 
   return { canEdit, setScore, setSuggested }

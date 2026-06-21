@@ -66,11 +66,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       ])
       if (token !== laadToken) return
 
-      // één scores-blob per groep dekt beide programma's (ids zijn genamespaced)
-      const byId = new Map<string, Act>([...acts.value, ...sfeerActs.value].map(a => [a.id, a]))
-      for (const [id, entry] of Object.entries(scores)) {
-        const act = byId.get(id)
-        if (!act) continue
+      // één scores-blob per groep dekt beide programma's (scoreKeys zijn
+      // genamespaced). We lopen over álle acts en passen de score per scoreKey
+      // toe: sfeermaker-activiteiten delen een scoreKey over hun sessies, dus
+      // één blob-entry werkt vanzelf door op elke sessie.
+      for (const act of [...acts.value, ...sfeerActs.value]) {
+        const entry = scores[act.scoreKey]
+        if (!entry) continue
         if (entry.status === 'suggested') {
           act.score = null
           act.status = 'suggested'

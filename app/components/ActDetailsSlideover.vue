@@ -17,6 +17,24 @@ if (import.meta.client) {
 
 const dayMeta = computed(() => DAY_META.find(d => d.key === act.value?.dayKey))
 
+// Sfeermaker-activiteiten komen vaak op meerdere tijdstippen terug (één score per
+// activiteit). Toon in plaats van één tijdslot álle sessies van deze activiteit,
+// op dag-kleur, gesorteerd op dag/tijd.
+const { acts: sfeerActs } = useProgramme('sfeermakers')
+const sessions = computed(() => {
+  const a = act.value
+  if (!a || a.programme !== 'sfeermakers' || a.timeless) return []
+  return sfeerActs.value
+    .filter(s => s.scoreKey === a.scoreKey && !s.timeless)
+    .slice()
+    .sort((x, y) => x.dayDate.localeCompare(y.dayDate) || x.startMin - y.startMin)
+    .map(s => ({
+      key: s.id,
+      label: `${DAY_META.find(d => d.key === s.dayKey)?.shortLabel ?? ''} ${s.time}`,
+      accent: DAY_META.find(d => d.key === s.dayKey)?.accentSoft ?? ''
+    }))
+})
+
 const curatorLine = computed(() => {
   if (!act.value?.curator) return null
   return act.value.curator === 'curator' ? 'is zelf curator van een takeover' : `gecureerd door ${act.value.curator}`
@@ -39,11 +57,18 @@ const metaLine = computed(() =>
           </div>
 
           <div class="flex flex-wrap items-center gap-2 text-sm font-bold">
+            <!-- muziek: één tijdslot. sfeermaker-activiteit: alle sessies (dag-kleur) -->
             <span
-              v-if="!act.timeless"
+              v-if="act.programme === 'muziek' && !act.timeless"
               class="rounded-full border-2 border-black px-2 py-0.5 text-xs"
               :class="dayMeta?.accentSoft"
             >{{ dayMeta?.label }} · {{ act.time }}</span>
+            <span
+              v-for="s in sessions"
+              :key="s.key"
+              class="rounded-full border-2 border-black px-2 py-0.5 text-xs"
+              :class="s.accent"
+            >{{ s.label }}</span>
             <StageBadge v-if="act.stage" :stage="act.stage" :programme="act.programme" />
             <span v-if="act.genre" class="rounded-full border-2 border-black px-2 py-0.5 text-xs" :class="genreColor(act.genre, act.programme)">
               {{ act.genre }}

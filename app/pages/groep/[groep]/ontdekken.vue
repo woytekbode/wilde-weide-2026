@@ -13,6 +13,19 @@ const musicFiltered = useFilteredActs('muziek')
 const sfeerFiltered = useFilteredActs('sfeermakers')
 const filteredActs = computed(() => programme.value === 'sfeermakers' ? sfeerFiltered.value : musicFiltered.value)
 
+// Sfeermaker-activiteiten komen vaak op meerdere tijdstippen terug; toon er per
+// activiteit (scoreKey) één kaart. De lijst is al op dag/tijd gesorteerd, dus de
+// eerste sessie is de representant. Muziek blijft per optreden.
+const cards = computed(() => {
+  if (programme.value !== 'sfeermakers') return filteredActs.value
+  const seen = new Set<string>()
+  return filteredActs.value.filter((a) => {
+    if (seen.has(a.scoreKey)) return false
+    seen.add(a.scoreKey)
+    return true
+  })
+})
+
 const musicProg = useProgramme('muziek')
 const sfeerProg = useProgramme('sfeermakers')
 const { show } = useActDetails()
@@ -45,13 +58,15 @@ function dayAccent(act: Act): string {
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <button
-        v-for="act in filteredActs"
+        v-for="act in cards"
         :key="act.id"
         class="ww-card relative flex cursor-pointer flex-col p-3.5 text-left transition-transform hover:scale-[1.02]"
         :class="[
           // schaduw schaalt met de score: 3 hartjes 6px, 2 hartjes 3px, rest vlak
           act.score === 3 ? 'shadow-[6px_6px_0_0_#000]!' : act.score === 2 ? 'shadow-[3px_3px_0_0_#000]!' : 'shadow-none!',
-          !act.timeless && actTimeStatus(act, now) === 'past' ? 'opacity-40 grayscale' : ''
+          // afgelopen-dimming alleen voor muziek (per optreden); sfeermaker-kaarten
+          // staan voor een activiteit met meerdere sessies, dus niet dimmen
+          programme === 'muziek' && actTimeStatus(act, now) === 'past' ? 'opacity-40 grayscale' : ''
         ]"
         @click="show(act)"
       >
@@ -69,14 +84,16 @@ function dayAccent(act: Act): string {
           >!</span>
         </span>
         <div class="mb-1.5 flex flex-wrap items-center gap-1.5 text-xs font-bold">
+          <!-- dag/tijd alleen voor muziek (per optreden); sfeermaker-kaarten
+               tonen alleen plek + categorie, de tijden staan in het Programma -->
           <span
-            v-if="!act.timeless && actTimeStatus(act, now) === 'now'"
+            v-if="programme === 'muziek' && actTimeStatus(act, now) === 'now'"
             class="rounded-full border-2 border-black bg-black px-1.5 py-0.5 text-[10px] font-black text-white"
           >NU</span>
-          <span v-if="!act.timeless" class="rounded-full border-2 border-black px-1.5 text-[10px] font-mono" :class="dayAccent(act)">
+          <span v-if="programme === 'muziek'" class="rounded-full border-2 border-black px-1.5 text-[10px] font-mono" :class="dayAccent(act)">
             {{ dayShort(act) }} {{ act.time }}
           </span>
-          <!-- sfeermaker zonder tijd/plek: toon het type i.p.v. de lege tijd-/podiumpil -->
+          <!-- sfeermaker zonder plek (ambient): toon het type i.p.v. een lege pil -->
           <span v-if="act.timeless && act.type" class="rounded-full border-2 border-black bg-veld-300 px-1.5 text-[10px]">
             {{ act.type }}
           </span>
@@ -94,6 +111,6 @@ function dayAccent(act: Act): string {
       </button>
     </div>
 
-    <p class="text-sm font-bold">{{ filteredActs.length }} {{ programme === 'sfeermakers' ? 'sfeermakers' : 'artiesten' }}</p>
+    <p class="text-sm font-bold">{{ cards.length }} {{ programme === 'sfeermakers' ? 'sfeermakers' : 'artiesten' }}</p>
   </div>
 </template>

@@ -50,6 +50,13 @@ export type DayKey = 'donderdag' | 'vrijdag' | 'zaterdag' | 'zondag'
 
 export interface Act extends SourceAct {
   id: string
+  /**
+   * Sleutel waaronder de score wordt opgeslagen/geladen. Voor muziek gelijk aan
+   * `id` (per optreden). Voor sfeermaker-activiteiten die op meerdere tijdstippen
+   * terugkomen is dit een activiteit-sleutel (`sfeermaker-<artiest>`), zodat één
+   * score op álle sessies van die activiteit slaat.
+   */
+  scoreKey: string
   /** uit welk programma deze act komt (muziek of sfeermakers) */
   programme: Programme
   /** null = sfeermaker zonder vast tijdslot/plek (timeless), staat in geen enkel dagschema */
