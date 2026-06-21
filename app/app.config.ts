@@ -12,8 +12,10 @@ export default defineAppConfig({
       slots: {
         // group op de wrapper zodat het hele veld (incl. icoon) mee-inverteert
         root: 'group',
-        // veld inverteert bij hover/focus naar zwart met witte tekst/placeholder
-        base: 'rounded-full border-[3px] border-black font-bold transition-colors placeholder:text-black/50 group-hover:bg-black group-hover:text-white group-hover:placeholder:text-white/50 group-focus-within:bg-black group-focus-within:text-white group-focus-within:placeholder:text-white/50',
+        // veld inverteert bij hover/focus naar zwart met witte tekst/placeholder.
+        // py-0.5! verlaagt de default md-padding (py-1.5) zodat de hoogte gelijk
+        // is aan de pill-knoppen/hartjesfilter (3px rand + 2px + 20px line-height)
+        base: 'py-0.5! rounded-full border-[3px] border-black font-bold transition-colors placeholder:text-black/50 group-hover:bg-black group-hover:text-white group-hover:placeholder:text-white/50 group-focus-within:bg-black group-focus-within:text-white group-focus-within:placeholder:text-white/50',
         leadingIcon: 'text-black transition-colors group-hover:text-white group-focus-within:text-white'
       },
       variants: {
@@ -28,8 +30,10 @@ export default defineAppConfig({
     selectMenu: {
       slots: {
         // group zodat de chevron mee-inverteert; de hover-inversie zelf staat in
-        // de variant hieronder (slot-classes verliezen het van de variant)
-        base: 'group rounded-full border-[3px] border-black font-bold transition-colors',
+        // de variant hieronder (slot-classes verliezen het van de variant).
+        // py-0.5! verlaagt de default md-padding (py-1.5) zodat de trigger even
+        // hoog is als de pill-knoppen/hartjesfilter
+        base: 'group py-0.5! rounded-full border-[3px] border-black font-bold transition-colors',
         placeholder: 'text-black/50 group-hover:text-white/50',
         trailingIcon: 'text-black transition-colors group-hover:text-white',
         // z-50 tilt de lijst boven de tabel/acts (die staan met relative +
