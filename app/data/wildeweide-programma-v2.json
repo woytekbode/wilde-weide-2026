@@ -35,7 +35,7 @@
       "soul funk & disco"
     ],
     "legend": {
-      "liveRep": "Reputatie 1-3 (sterren): 3 = bewezen topper, 2 = solide, 1 = weinig info of vlak",
+      "liveRep": "Live-reputatie 1-3 (sterren): 3 = bewezen topper, 2 = solide, 1 = weinig info of vlak",
       "style": "Precieze typering per act; type/genre zijn brede filter-buckets",
       "host": "Gevuld als de act onderdeel is van een hosting-blok",
       "curator": "Naam van de curator die deze act koos; \"curator\" = de act is zelf een van de vijf curatoren; null = regulier geboekt"
