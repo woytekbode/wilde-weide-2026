@@ -1,10 +1,12 @@
-import { GROEP_LS_KEY, GROEPSWISSEL_QUERY, isGeldigeGroepSlug } from '#shared/groep'
+import { GROEP_LS_KEY, isGeldigeGroepSlug } from '#shared/groep'
 
 const LEGACY_PADEN = ['/tabel', '/ontdekken', '/podia']
 
 /**
  * Routing rond groepen: oude deep links zonder groep doorsturen naar de
- * laatst gebruikte groep, en op een verse load van / direct het schema in.
+ * laatst gebruikte groep. De verse-load-van-/ → schema redirect zit bewust
+ * in pages/index.vue (onMounted, ná hydration): tijdens hydration zou een
+ * redirect het max-w-xl-formulier-DOM op de groepspagina laten plakken.
  * Het onthouden/vergeten van de groep zelf doet plugins/groep.client.ts,
  * pas nadat de groep echt blijkt te bestaan.
  */
@@ -38,11 +40,5 @@ export default defineNuxtRouteMiddleware((to) => {
   // oude deep links zonder groep → naar de laatst gebruikte groep
   if (LEGACY_PADEN.includes(to.path)) {
     return navigateTo(laatste ? `/groep/${laatste}${to.path}` : '/', { replace: true })
-  }
-
-  // verse load op / met een bekende groep → direct het schema in;
-  // in-app naar / navigeren (groep wisselen) of ?groepswissel toont het formulier
-  if (to.path === '/' && laatste && to.query[GROEPSWISSEL_QUERY] === undefined && useNuxtApp().isHydrating) {
-    return navigateTo(`/groep/${laatste}`, { replace: true })
   }
 })

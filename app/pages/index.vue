@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { GROEPSWISSEL_QUERY } from '#shared/groep'
+
 definePageMeta({ wwBg: 'lila' })
 
+const route = useRoute()
 const { rememberGroep, lastGroep } = useGroep()
 
 const naam = ref('')
@@ -11,7 +14,16 @@ const gemaakt = ref<{ slug: string, naam: string } | null>(null)
 // pas na mount bekend: localStorage bestaat niet tijdens prerender
 const laatste = ref<{ slug: string, naam: string } | null>(null)
 onMounted(() => {
-  laatste.value = lastGroep()
+  const last = lastGroep()
+  // verse load op / met een bekende groep → direct het schema in. Bewust ná
+  // hydration (niet in de middleware): een redirect tijdens hydration laat het
+  // max-w-xl-formulier-DOM op de groepspagina plakken. ?groepswissel (bewust
+  // van groep wisselen) slaat de redirect over en toont het formulier.
+  if (last && route.query[GROEPSWISSEL_QUERY] === undefined) {
+    navigateTo(`/groep/${last.slug}`, { replace: true })
+    return
+  }
+  laatste.value = last
 })
 
 const deelLink = computed(() => gemaakt.value ? `${location.origin}/groep/${gemaakt.value.slug}` : '')
