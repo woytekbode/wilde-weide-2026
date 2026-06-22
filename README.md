@@ -1,4 +1,6 @@
-# Wilde Weide 2026 — met wie ga jij?
+# Wilde Weide 2026 Vriendenplek
+
+> Met wie ga jij?
 
 Een eigen festivalplanner voor [Wilde Weide Festival](https://wildeweide.nl/) (3.4.5 juli 2026, Netl de Wildste Tuin, Kraggenburg). Je verzint een **groepsnaam**, deelt de link met je vrienden (of vage kennissen), en samen scoren jullie het programma met **hartjes** — iedereen ziet elkaars keuzes. Gebouwd met Nuxt 4 + Nuxt UI, stijl losjes gepikt van de festivalsite.
 
@@ -14,13 +16,12 @@ Geen account, geen wachtwoord. De groepsnaam ís de sleutel.
 
 De onderbalk (mobiel) en de nav bovenin (desktop) brengen je naar:
 
-- **Schema** — het blokkenschema per dag, podia als kolommen. Markeert een **Conflict** (`!`) als twee favorieten tegelijk spelen, een **Tip** (`?`) voor suggesties, en een zwarte **NU**-chip + nu-lijn voor wat er op dit moment speelt. Tik op een podiumnaam om dat **podium te verbergen**.
-- **Artiesten** — alle acts als kaartjes met genre, stijl en hartjes. Hoe meer hartjes, hoe dikker de schaduw.
-- **Sfeer** — de **sfeermakers** (hosting & acts die de boel maken): tik om te liken, je likes schuiven naar boven.
+- **Programma** — het blokkenschema per dag, podia als kolommen. Markeert een **Conflict** (`!`) als twee favorieten tegelijk spelen, een **Tip** (`?`) voor suggesties, en een zwarte **NU**-chip + nu-lijn voor wat er op dit moment speelt. Tik op een podiumnaam om dat **podium te verbergen**.
+- **Ontdekken** — alle acts als kaartjes met genre, stijl en hartjes; hoe meer hartjes, hoe dikker de schaduw. Een toggle in de filterbalk schakelt tussen **muziek** (per optreden) en de **sfeermakers** (hosting & acts die de boel maken — één kaart per activiteit, ook al keert die meermaals terug).
 - **Podia** — per dag en per podium in één zin wat voor sfeer je daar kunt verwachten.
 - **Kaart** — de **plattegrond**: knijp om te zoomen, tik om je **tent** te plaatsen. De tentlocatie is gedeeld, zodat de hele groep weet waar jullie kamperen.
 
-Er is ook een (verstopte) **Tabel** op `/groep/<naam>/tabel`: dezelfde acts, sorteerbaar en filterbaar.
+Er is ook een (verstopte) **Tabel** op `/groep/<naam>/tabel`: dezelfde acts, sorteerbaar en filterbaar. Oude links naar `/artiesten` en `/sfeer` sturen automatisch door naar **Ontdekken**.
 
 ### Scoren met hartjes
 
