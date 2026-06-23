@@ -53,7 +53,7 @@ if (import.meta.client) {
                 >Kas</span>
               </div>
               <p class="text-sm">
-                <span class="font-bold">Verberg podium</span> tik op de podiumnaam en hij verdwijnt.
+                <span class="font-bold">Podium</span> klik op de podiumnaam en het podium verdwijnt.
               </p>
             </div>
 
@@ -104,6 +104,17 @@ if (import.meta.client) {
               </div>
               <p class="text-sm">
                 <span class="font-bold">Tijdreizen</span> geen geduld tot het weekend? Doe net alsof je er al bent, zet een liedje op en doe een dansje.
+              </p>
+            </div>
+
+            <!-- nu -->
+            <div class="flex items-center gap-4 py-3">
+              <div class="flex w-24 shrink-0 items-center">
+                <span class="flex h-5 shrink-0 items-center rounded-full border-2 border-black bg-black px-1 text-[9px] font-black text-white">NU</span>
+                <span class="block h-0 grow border-t-[3px] border-black" />
+              </div>
+              <p class="text-sm">
+                <span class="font-bold">NU</span> tijdens het festival zie je precies welke artiest je nét hebt gemist vanwege die tweede pannekoek.
               </p>
             </div>
           </div>

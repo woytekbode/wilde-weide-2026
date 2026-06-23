@@ -238,7 +238,7 @@ function blockStyle(act: Act) {
         <span class="absolute right-1 top-1 flex gap-0.5">
           <span
             v-if="actTimeStatus(act, now) === 'now'"
-            class="flex h-5 items-center rounded-full border-2 border-black bg-black px-1 text-[9px] font-black text-white"
+            class="flex h-4 items-center rounded-full bg-black px-1 text-[9px] font-black text-white"
           >NU</span>
           <span
             v-if="act.status === 'suggested'"
@@ -283,7 +283,7 @@ function blockStyle(act: Act) {
         class="pointer-events-none relative z-20"
         :style="{ gridColumn: '1 / -1', gridRow: String(nowLine.row), marginTop: `${nowLine.offsetRem}rem` }"
       >
-        <div class="border-t-[3px] border-black" />
+        <div class="mt-[-1.5px] border-t-[3px] border-black" />
       </div>
       <!-- tijdlabel van de nu-lijn: over de tijdschaal, sticky bij horizontaal scrollen -->
       <div
@@ -291,7 +291,7 @@ function blockStyle(act: Act) {
         class="pointer-events-none sticky left-0 z-30"
         :style="{ gridColumn: '1', gridRow: String(nowLine.row), marginTop: `${nowLine.offsetRem}rem` }"
       >
-        <span class="absolute -top-2.5 left-0 rounded-full border-2 border-black bg-black px-1.5 text-[10px] font-black text-white">
+        <span class="absolute left-0 top-0 -translate-y-1/2 rounded-full bg-black px-1 text-xs font-black text-white">
           {{ now ? new Date(now).toTimeString().slice(0, 5) : '' }}
         </span>
       </div>
