@@ -63,7 +63,7 @@ if (import.meta.client) {
                 <StarMarks :count="3" size="size-3" />
               </div>
               <p class="text-sm">
-                <span class="font-bold">Reputatie</span> wat Claude zegt, zegt natuurlijk niks over jullie voorkeur!
+                <span class="font-bold">Reputatie</span> dit is wat onze AI overlord online heeft gevonden, zegt natuurlijk niks over jullie voorkeur!
               </p>
             </div>
 
