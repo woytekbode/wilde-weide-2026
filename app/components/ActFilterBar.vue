@@ -26,8 +26,8 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
 </script>
 
 <template>
-  <div class="ww-card space-y-3 p-3">
-    <div class="flex flex-wrap items-center gap-2">
+  <div class="ww-card space-y-2 p-3">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <UInput
         v-model="filters.search"
         icon="i-lucide-search"
@@ -69,41 +69,29 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
         class="w-36"
       />
       <button class="ww-btn py-0.5! text-sm" @click="reset()">wis filters</button>
-
-      <!-- programmawissel; zelfde chip-stijl, rechts op desktop (sm:ml-auto),
-           links uitgelijnd bij wrappen op telefoon -->
-      <div class="flex items-center gap-2 sm:ml-auto">
-        <button
-          v-for="p in PROGRAMMES"
-          :key="p.value"
-          class="ww-btn py-0.5! text-sm max-sm:px-2!"
-          :class="{ 'ww-btn-active': programme === p.value }"
-          @click="programme = p.value"
-        >{{ p.label }}</button>
-      </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2 text-sm">
-      <span class="font-bold">dag:</span>
-      <button
-        class="ww-btn py-0.5! text-sm"
-        :class="{ 'ww-btn-active': filters.day === 'alle' }"
-        @click="filters.day = 'alle'"
-      >alle</button>
-      <button
-        v-for="day in DAY_META"
-        :key="day.key"
-        class="ww-btn py-0.5! text-sm"
-        :class="{ 'ww-btn-active': filters.day === day.key }"
-        @click="filters.day = day.key"
-      >{{ day.shortLabel }}</button>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+      <div class="flex flex-wrap items-center gap-0.5">
+        <button
+          class="ww-btn py-0.5! text-sm max-sm:px-2!"
+          :class="{ 'ww-btn-active': filters.day === 'alle' }"
+          @click="filters.day = 'alle'"
+        >alle</button>
+        <button
+          v-for="day in DAY_META"
+          :key="day.key"
+          class="ww-btn py-0.5! text-sm capitalize max-sm:px-2!"
+          :class="{ 'ww-btn-active': filters.day === day.key }"
+          @click="filters.day = day.key"
+        >{{ day.shortLabel }}</button>
+      </div>
 
       <!-- score-label + chips in één groep zodat "score:" mee naar een nieuwe
            regel zakt i.p.v. los achter te blijven -->
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-0.5">
         <!-- sm:ml-3 alleen als score op dezelfde regel als 'dag:' staat; bij
              wrappen op telefoon geen inspring zodat het uitlijnt met 'dag:' -->
-        <span class="font-bold sm:ml-3">hartjes:</span>
         <button
           v-for="opt in SCORE_OPTIONS"
           :key="opt.value"
@@ -116,10 +104,22 @@ const anyPast = computed(() => now.value !== null && acts.value.some(a => actTim
 
       <button
         v-if="anyPast"
-        class="ww-btn py-0.5! ml-3 text-sm"
+        class="ww-btn py-0.5! text-sm"
         :class="{ 'ww-btn-active': filters.hideFinished }"
         @click="filters.hideFinished = !filters.hideFinished"
       >verberg afgelopen</button>
+
+      <!-- programmawissel; op telefoon onderaan op een eigen regel (basis-full),
+           op desktop rechtsonder (sm:ml-auto) -->
+      <div class="flex items-center gap-0.5 max-sm:basis-full sm:ml-auto">
+        <button
+          v-for="p in PROGRAMMES"
+          :key="p.value"
+          class="ww-btn py-0.5! text-sm max-sm:px-2!"
+          :class="{ 'ww-btn-active': programme === p.value }"
+          @click="programme = p.value"
+        >{{ p.label }}</button>
+      </div>
     </div>
   </div>
 </template>

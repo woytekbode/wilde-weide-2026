@@ -13,8 +13,8 @@ const nav = computed(() => {
     { to: base, label: 'Programma', icon: 'i-lucide-layout-template' },
     // Tabel-pagina blijft bestaan (/tabel werkt nog), maar staat bewust niet in de nav
     // { to: `${base}/tabel`, label: 'Tabel', icon: 'i-lucide-table' },
-    { to: `${base}/ontdekken`, label: 'Ontdekken', icon: 'i-lucide-layout-grid' },
-    { to: `${base}/podia`, label: 'Podia', icon: 'i-lucide-ship' },
+    { to: `${base}/ontdekken`, label: 'Ontdekken', icon: 'i-lucide-binoculars' },
+    { to: `${base}/podia`, label: 'Podia', icon: 'i-lucide-bubbles' },
     { to: `${base}/kaart`, label: 'Kaart', icon: 'i-lucide-map' }
   ]
 })
