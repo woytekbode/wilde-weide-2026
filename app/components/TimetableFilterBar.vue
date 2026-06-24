@@ -37,7 +37,7 @@ const dayHiddenStages = computed(() => {
       ><HeartMarks v-if="opt.hearts" v-bind="opt.hearts" size="size-3" inherit class="h-5" /><template v-else>{{ opt.label }}</template></button>
     </div>
 
-    <div v-if="dayHiddenStages.length > 0" class="flex flex-wrap items-center gap-0.5">
+    <div v-if="dayHiddenStages.length > 0" class="flex flex-wrap items-center gap-0.5 max-sm:basis-full">
       <button
         v-for="stage in dayHiddenStages"
         :key="stage"
@@ -52,7 +52,7 @@ const dayHiddenStages = computed(() => {
     <!-- programmawissel; zelfde chip-stijl als de hartjesfilter. sm:ml-auto duwt
          hem rechts op desktop, maar bij wrappen op telefoon links uitgelijnd zoals
          de hartjeschips -->
-    <div class="flex items-center gap-0.5 sm:ml-auto">
+    <div class="flex items-center gap-0.5 max-sm:basis-full sm:ml-auto">
       <button
         v-for="p in PROGRAMMES"
         :key="p.value"
