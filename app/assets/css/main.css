@@ -142,7 +142,7 @@ h1, h2, h3, h4 {
 /* Navigatie (dagen + hoofdmenu): alleen outline, actief = zwart gevuld met
    tekst in de paginakleur */
 .ww-nav-btn {
-  @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-transparent px-4 py-1.5 font-sans font-bold text-black transition-colors duration-200;
+  @apply inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-[3px] border-black bg-transparent px-4 font-sans font-bold leading-none text-black transition-colors duration-200;
 }
 /* actieve toestand altijd gevuld (ook zonder hover-capabele input) */
 .ww-nav-btn-active,

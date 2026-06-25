@@ -64,17 +64,17 @@ useHead({
     <header class="mx-auto max-w-7xl px-4 pt-5 pb-4 lg:px-8">
       <!-- titelrij + nav delen één regel en lijnen onderaan uit; de pilhoogte
            valt samen met de teksthoogte, dus de bovenkanten lopen ook gelijk -->
-      <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-        <div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
-          <NuxtLink :to="groep ? `/groep/${groep}` : '/'" class="block">
+      <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 lg:flex-nowrap">
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 lg:flex-col lg:items-start lg:gap-1 xl:flex-row xl:items-baseline xl:gap-3">
+          <NuxtLink :to="groep ? `/groep/${groep}` : '/'" >
             <h1 class="font-display text-4xl font-black leading-none tracking-tight lg:text-5xl">
-              Wilde Weide 2026
+              Wilde Weide
             </h1>
           </NuxtLink>
-          <h2 class="font-display text-xl font-black leading-none lg:text-2xl"><span class="align-bottom text-sm lg:text-base">🌿</span> Vriendenplek <span class="align-bottom text-sm lg:text-base">🌿</span></h2>
+          <h2 class="font-display text-2xl font-black leading-none lg:text-3xl"><span class="align-bottom text-base lg:text-lg">🌿</span> Vriendenplek <span class="align-bottom text-base lg:text-lg">🌿</span></h2>
         </div>
 
-        <nav v-if="groep" class="hidden gap-2 lg:flex">
+        <nav v-if="groep" class="hidden shrink-0 gap-2 lg:mt-1.5 lg:flex">
           <NuxtLink
             v-for="item in nav"
             :key="item.to"
