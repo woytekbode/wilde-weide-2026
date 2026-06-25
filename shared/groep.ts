@@ -74,6 +74,22 @@ export interface AdminGroepenResponse {
   totaal: { groepen: number, likes: number, active: number }
 }
 
+/** aggregated likes per scoreKey, across all non-admin groups */
+export interface LikeAggregate {
+  /** sum of heart values (1/2/3) across groups — primary measure */
+  hearts: number
+  /** number of groups that gave this act ≥1 heart */
+  groups: number
+  /** number of groups that marked it as a tip (suggested) */
+  suggested: number
+}
+export type LikeAggregateMap = Record<string, LikeAggregate>
+
+/** antwoord van GET /api/admin/likes */
+export interface AdminLikesResponse {
+  likes: LikeAggregateMap
+}
+
 /** een groep geldt als 'actief' als er een sessie binnen dit venster gezien is */
 export const ACTIVE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
 
