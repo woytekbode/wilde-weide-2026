@@ -171,7 +171,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           <p v-if="!topActs.length" class="px-4 py-3 text-sm font-bold text-black/60">
             Geen acts
           </p>
-          <ol v-else class="divide-y-2 divide-black/10">
+          <TransitionGroup v-else tag="ol" name="topper" class="relative divide-y-2 divide-black/10">
             <component
               :is="groep ? 'button' : 'div'"
               v-for="(row, i) in topActs"
@@ -202,7 +202,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                 <div class="text-[11px] font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
               </div>
             </component>
-          </ol>
+          </TransitionGroup>
         </section>
 
         <!-- Per podium: opgetelde hartjes, gemiddelde per act, aantal acts -->
@@ -269,3 +269,25 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
     </template>
   </div>
 </template>
+
+<style scoped>
+/* Subtiele in/uit-animatie bij het filteren van genres: weggefilterde rijen
+   faden weg en de rest schuift omhoog (move). Alleen met bewegingsvoorkeur; de
+   leave-rij gaat absoluut uit de flow zodat de move-transitie kan lopen. */
+@media (prefers-reduced-motion: no-preference) {
+  .topper-move,
+  .topper-enter-active,
+  .topper-leave-active {
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+  .topper-enter-from,
+  .topper-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  .topper-leave-active {
+    position: absolute;
+    width: 100%;
+  }
+}
+</style>
