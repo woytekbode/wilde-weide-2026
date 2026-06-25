@@ -4,6 +4,11 @@ import { buildActs } from '~/composables/useActs'
 import { genreColor } from '~/data/display'
 import type { Act } from '~/types/program'
 
+// rijen zijn alleen klikbaar binnen een groep (de slideover-scoring hoort niet
+// op de groeploze badmeester-pagina); show() opent de gedeelde act-slideover
+const { groep } = useGroep()
+const { show } = useActDetails()
+
 const totaal = ref({ groepen: 0, likes: 0, active: 0 })
 const likes = ref<LikeAggregateMap>({})
 const bezig = ref(true)
@@ -50,9 +55,23 @@ const joined = computed<Joined[]>(() => {
   return out
 })
 
-/** top 10 acts; primair op gewogen hartjes, dan op aantal groepen */
+// lichte genrefilter: alleen voor de Acts-top-10. Leeg = alles tonen; een genre
+// in de set wordt uit de top-10 weggelaten (Podia/Genres blijven globaal). Je
+// bouwt de filter op door een genre-badge ín een act-rij aan te tikken.
+const verborgenGenres = ref(new Set<string>())
+function toggleGenre(g: string) {
+  const next = new Set(verborgenGenres.value)
+  if (next.has(g)) next.delete(g)
+  else next.add(g)
+  verborgenGenres.value = next
+}
+
+/** top 10 acts; gefilterd op genre, primair op gewogen hartjes, dan op groepen */
 const topActs = computed(() =>
-  [...joined.value].sort((a, b) => b.hearts - a.hearts || b.groups - a.groups).slice(0, 10)
+  joined.value
+    .filter(j => !j.act.genre || !verborgenGenres.value.has(j.act.genre))
+    .sort((a, b) => b.hearts - a.hearts || b.groups - a.groups)
+    .slice(0, 10)
 )
 
 interface StageRow { stage: string, hearts: number, groups: number, acts: number, avg: number }
@@ -131,24 +150,48 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Acts</h2>
-            <p class="text-[11px] font-bold text-black/40">aantal hartjes per act</p>
+            <p class="text-[11px] font-bold text-black/40">Aantal hartjes per act. Klik op een genre om te filteren.</p>
           </div>
-          <ol class="divide-y-2 divide-black/10">
-            <li
+
+          <!-- filterbalk: verschijnt zodra je een genre-badge in een rij aantikt;
+               tik een pill aan om dat genre weer terug te halen -->
+          <div
+            v-if="verborgenGenres.size"
+            class="flex flex-wrap items-center gap-1.5 border-b-2 border-black/10 px-4 py-2.5"
+          >
+            <button
+              v-for="g in verborgenGenres"
+              :key="g"
+              class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-[10px] font-bold whitespace-nowrap transition hover:brightness-95"
+              :class="genreColor(g)"
+              @click="toggleGenre(g)"
+            >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
+          </div>
+
+          <p v-if="!topActs.length" class="px-4 py-3 text-sm font-bold text-black/60">
+            Geen acts
+          </p>
+          <ol v-else class="divide-y-2 divide-black/10">
+            <component
+              :is="groep ? 'button' : 'div'"
               v-for="(row, i) in topActs"
               :key="row.act.id"
-              class="flex items-center gap-3 px-4 py-2.5"
+              class="flex w-full items-center gap-3 px-4 py-2.5 text-left"
+              :class="groep ? 'cursor-pointer transition hover:bg-black/5 motion-safe:active:scale-[0.99]' : ''"
+              @click="groep && show(row.act)"
             >
               <span class="w-5 shrink-0 text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 1 }}</span>
               <div class="min-w-0 flex-1">
                 <div class="truncate font-bold">{{ row.act.artist }}</div>
                 <div class="mt-1 flex flex-wrap items-center gap-1.5">
                   <StageBadge :stage="row.act.stage" size="xs" />
-                  <span
+                  <button
                     v-if="row.act.genre"
-                    class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-[10px] font-bold whitespace-nowrap"
+                    class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-[10px] font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
                     :class="genreColor(row.act.genre)"
-                  >{{ row.act.genre }}</span>
+                    title="Verberg dit genre uit de top-10"
+                    @click.stop="toggleGenre(row.act.genre)"
+                  >{{ row.act.genre }}</button>
                   <span class="text-[11px] font-bold text-black/40">{{ row.act.dayKey }}</span>
                 </div>
               </div>
@@ -158,7 +201,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                 </div>
                 <div class="text-[11px] font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
               </div>
-            </li>
+            </component>
           </ol>
         </section>
 
@@ -166,7 +209,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Podia</h2>
-            <p class="text-[11px] font-bold text-black/40">aantal hartjes per podium</p>
+            <p class="text-[11px] font-bold text-black/40">Aantal hartjes per podium.</p>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li
@@ -199,7 +242,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Genres</h2>
-            <p class="text-[11px] font-bold text-black/40">gemiddeld aantal hartjes per act per genre</p>
+            <p class="text-[11px] font-bold text-black/40">Gemiddeld aantal hartjes per act per genre.</p>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li v-for="row in genres" :key="row.genre" class="px-4 py-2.5">
