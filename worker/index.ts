@@ -78,12 +78,10 @@ export default {
 
       const groepen = await env.SCORES.get<GroepenRegister>(GROEPEN_KEY, 'json') ?? {}
       const rijen: AdminGroep[] = []
-      let groepenTotaal = 0
       let likesTotaal = 0
       let actiefTotaal = 0
       for (const slug in groepen) {
         const info = groepen[slug]!
-        const admin = isAdminGroep(info)
         const [scores, sfeer, tent, stats] = await Promise.all([
           env.SCORES.get<GroepScoreMap>(scoresKey(slug), 'json'),
           env.SCORES.get<GroepSfeerMap>(sfeerKey(slug), 'json'),
@@ -92,26 +90,22 @@ export default {
         ])
         const likes = telStatus(scores, 'scored')
         const samenvatting = summarizeStats(stats)
+        likesTotaal += likes
+        if (samenvatting.active) actiefTotaal++
         rijen.push({
           slug,
           naam: info.naam,
           t: info.t,
-          admin,
+          admin: isAdminGroep(info),
           likes,
           suggestions: telStatus(scores, 'suggested'),
           sfeer: sfeer ? Object.keys(sfeer).length : 0,
           tent: tent !== null,
           ...samenvatting
         })
-        // de beheergroep blijft in de lijst zichtbaar, maar telt niet mee in de
-        // totalen — die beschrijven de echte vriendengroepen (idem /api/admin/likes)
-        if (admin) continue
-        groepenTotaal++
-        likesTotaal += likes
-        if (samenvatting.active) actiefTotaal++
       }
       rijen.sort((a, b) => b.t - a.t)
-      return json({ groepen: rijen, totaal: { groepen: groepenTotaal, likes: likesTotaal, active: actiefTotaal } })
+      return json({ groepen: rijen, totaal: { groepen: rijen.length, likes: likesTotaal, active: actiefTotaal } })
     }
 
     // geaggregeerde likes per scoreKey, over alle niet-beheer groepen
@@ -125,7 +119,6 @@ export default {
       const groepen = await env.SCORES.get<GroepenRegister>(GROEPEN_KEY, 'json') ?? {}
       const likes: LikeAggregateMap = {}
       for (const slug in groepen) {
-        if (isAdminGroep(groepen[slug])) continue
         const scores = await env.SCORES.get<GroepScoreMap>(scoresKey(slug), 'json')
         if (!scores) continue
         for (const key in scores) {

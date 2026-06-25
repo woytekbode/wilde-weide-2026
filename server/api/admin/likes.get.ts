@@ -1,5 +1,5 @@
 import type { GroepenRegister, GroepScoreMap, LikeAggregateMap } from '#shared/groep'
-import { GROEPEN_KEY, isAdminGroep, scoresKey } from '#shared/groep'
+import { GROEPEN_KEY, scoresKey } from '#shared/groep'
 
 /** Dev-spiegel van GET /api/admin/likes in worker/index.ts */
 export default defineEventHandler(async (event) => {
@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
   const groepen = await kv.getItem<GroepenRegister>(GROEPEN_KEY) ?? {}
   const likes: LikeAggregateMap = {}
   for (const slug in groepen) {
-    if (isAdminGroep(groepen[slug])) continue
     const scores = await kv.getItem<GroepScoreMap>(scoresKey(slug))
     if (!scores) continue
     for (const key in scores) {
