@@ -41,12 +41,12 @@ const dayHiddenStages = computed(() => {
       <button
         v-for="stage in dayHiddenStages"
         :key="stage"
-        class="cursor-pointer rounded-full border-[3px] border-black px-3 py-1 text-xs font-bold transition-transform motion-safe:active:scale-95"
+        class="inline-flex cursor-pointer items-center gap-1 rounded-full border-[3px] border-black py-1 pl-3 pr-2 text-xs font-bold transition-transform motion-safe:active:scale-95"
         :class="stageColor(stage, programme)"
         :style="{ viewTransitionName: `stage-${slugify(stage)}`, viewTransitionClass: 'ww-chip' }"
         title="toon podium"
         @click="toggleStage(stage)"
-      >{{ stage }}</button>
+      >{{ stage }}<UIcon name="i-lucide-x" class="size-3.5" /></button>
     </div>
 
     <!-- programmawissel; zelfde chip-stijl als de hartjesfilter. sm:ml-auto duwt
