@@ -164,6 +164,42 @@ export default {
       return json({ ok: true })
     }
 
+    // Publieke stats: dezelfde geaggregeerde, niet-persoonlijke cijfers die het
+    // beheerpaneel toont (totalen + hartjes per scoreKey), maar zónder token en
+    // zónder het per-groep register (namen/slugs/sessies blijven privé).
+    if (url.pathname === '/api/stats') {
+      if (request.method !== 'GET') {
+        return json({ error: 'method not allowed' }, 405)
+      }
+      const groepen = await env.SCORES.get<GroepenRegister>(GROEPEN_KEY, 'json') ?? {}
+      const likes: LikeAggregateMap = {}
+      let likesTotaal = 0
+      let actiefTotaal = 0
+      for (const slug in groepen) {
+        const [scores, stats] = await Promise.all([
+          env.SCORES.get<GroepScoreMap>(scoresKey(slug), 'json'),
+          env.SCORES.get<GroepStats>(statsKey(slug), 'json')
+        ])
+        if (summarizeStats(stats).active) actiefTotaal++
+        if (!scores) continue
+        for (const key in scores) {
+          const e = scores[key]!
+          if (e.status === 'scored') likesTotaal += 1
+          const agg = (likes[key] ??= { hearts: 0, groups: 0, suggested: 0 })
+          if (e.status === 'scored' && e.score) {
+            agg.hearts += e.score
+            agg.groups += 1
+          } else if (e.status === 'suggested') {
+            agg.suggested += 1
+          }
+        }
+      }
+      return json({
+        totaal: { groepen: Object.keys(groepen).length, likes: likesTotaal, active: actiefTotaal },
+        likes
+      })
+    }
+
     // join-or-create: bestaat de naam al, dan sluit je je daarbij aan
     if (url.pathname === '/api/groep') {
       if (request.method !== 'POST') {

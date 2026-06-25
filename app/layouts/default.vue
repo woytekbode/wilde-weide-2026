@@ -14,6 +14,7 @@ const nav = computed(() => {
     // Tabel-pagina blijft bestaan (/tabel werkt nog), maar staat bewust niet in de nav
     // { to: `${base}/tabel`, label: 'Tabel', icon: 'i-lucide-table' },
     { to: `${base}/ontdekken`, label: 'Ontdekken', icon: 'i-lucide-binoculars' },
+    { to: `${base}/toppers`, label: 'Toppers', icon: 'i-lucide-podium' },
     { to: `${base}/podia`, label: 'Podia', icon: 'i-lucide-bubbles' },
     { to: `${base}/kaart`, label: 'Kaart', icon: 'i-lucide-map' }
   ]

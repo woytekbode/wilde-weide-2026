@@ -90,6 +90,16 @@ export interface AdminLikesResponse {
   likes: LikeAggregateMap
 }
 
+/**
+ * Antwoord van GET /api/stats — publiek (geen token). Bevat uitsluitend
+ * niet-persoonlijke aggregaten: totalen + geaggregeerde hartjes per scoreKey.
+ * Nooit het per-groep register (namen/slugs/sessies).
+ */
+export interface StatsResponse {
+  totaal: { groepen: number, likes: number, active: number }
+  likes: LikeAggregateMap
+}
+
 /** een groep geldt als 'actief' als er een sessie binnen dit venster gezien is */
 export const ACTIVE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
 
