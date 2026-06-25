@@ -74,12 +74,12 @@ function dayAccent(act: Act): string {
         <span class="absolute right-1.5 top-1.5 flex gap-0.5">
           <span
             v-if="act.status === 'suggested'"
-            class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-[10px] font-black"
+            class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-3xs font-black"
             title="Tip — nog geen hartjes"
           >?</span>
           <span
             v-if="conflictIds.has(act.id)"
-            class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-red-400 text-[10px] font-black"
+            class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-red-400 text-3xs font-black"
             title="Overlapt met een andere favoriet"
           >!</span>
         </span>
@@ -88,17 +88,17 @@ function dayAccent(act: Act): string {
                tonen alleen plek + categorie, de tijden staan in het Programma -->
           <span
             v-if="programme === 'muziek' && actTimeStatus(act, now) === 'now'"
-            class="rounded-full border-2 border-black bg-black px-1.5 py-0.5 text-[10px] font-black text-white"
+            class="rounded-full border-2 border-black bg-black px-1.5 py-0.5 text-3xs font-black text-white"
           >NU</span>
-          <span v-if="programme === 'muziek'" class="rounded-full border-2 border-black px-1.5 text-[10px] font-mono" :class="dayAccent(act)">
+          <span v-if="programme === 'muziek'" class="rounded-full border-2 border-black px-1.5 text-3xs font-mono" :class="dayAccent(act)">
             {{ dayShort(act) }} {{ act.time }}
           </span>
           <!-- sfeermaker zonder plek (ambient): toon het type i.p.v. een lege pil -->
-          <span v-if="act.timeless && act.type" class="rounded-full border-2 border-black bg-veld-300 px-1.5 text-[10px]">
+          <span v-if="act.timeless && act.type" class="rounded-full border-2 border-black bg-veld-300 px-1.5 text-3xs">
             {{ act.type }}
           </span>
           <StageBadge v-if="act.stage" :stage="act.stage" :programme="act.programme" size="xs" />
-          <span v-if="act.genre" class="rounded-full border-2 border-black px-1.5 text-[10px]" :class="genreColor(act.genre, act.programme)">
+          <span v-if="act.genre" class="rounded-full border-2 border-black px-1.5 text-3xs" :class="genreColor(act.genre, act.programme)">
             {{ act.genre }}
           </span>
         </div>

@@ -90,7 +90,7 @@ async function verwijder(groep: AdminGroep) {
             <span class="truncate font-bold">{{ groep.naam }}</span>
             <span
               v-if="groep.admin"
-              class="shrink-0 rounded-full border-2 border-black px-2 text-[11px] font-bold"
+              class="shrink-0 rounded-full border-2 border-black px-2 text-2xs font-bold"
             >beheer</span>
           </div>
           <div class="truncate text-xs font-bold text-black/50">{{ groep.slug }}</div>

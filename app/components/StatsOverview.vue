@@ -168,11 +168,11 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           <button
             v-for="g in verborgenGenres"
             :key="g"
-            class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-[10px] font-bold whitespace-nowrap transition hover:brightness-95"
+            class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition hover:brightness-95"
             :class="genreColor(g)"
             @click="toggleGenre(g)"
           >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
-          <p v-if="!verborgenGenres.size" class="text-[11px] font-bold text-black/40">
+          <p v-if="!verborgenGenres.size" class="text-2xs font-bold text-black/40">
             Klik op een genre om te filteren.
           </p>
         </section>
@@ -181,7 +181,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Acts</h2>
-            <p class="text-[11px] font-bold text-black/40">Aantal hartjes per act.</p>
+            <p class="text-2xs font-bold text-black/40">Aantal hartjes per act.</p>
           </div>
 
           <p v-if="!topActs.length" class="px-4 py-3 text-sm font-bold text-black/60">
@@ -203,19 +203,19 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                   <StageBadge :stage="row.act.stage" size="xs" />
                   <button
                     v-if="row.act.genre"
-                    class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-[10px] font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
+                    class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
                     :class="genreColor(row.act.genre)"
                     title="Verberg dit genre uit de top-10"
                     @click.stop="toggleGenre(row.act.genre)"
                   >{{ row.act.genre }}</button>
-                  <span class="text-[11px] font-bold text-black/40">{{ row.act.dayKey }}</span>
+                  <span class="text-2xs font-bold text-black/40">{{ row.act.dayKey }}</span>
                 </div>
               </div>
               <div class="shrink-0 text-right">
                 <div class="flex items-center justify-end gap-1 font-display text-lg font-black tabular-nums">
                   <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                 </div>
-                <div class="text-[11px] font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
+                <div class="text-2xs font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
               </div>
             </component>
           </TransitionGroup>
@@ -225,7 +225,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Podia</h2>
-            <p class="text-[11px] font-bold text-black/40">Aantal hartjes per podium.</p>
+            <p class="text-2xs font-bold text-black/40">Aantal hartjes per podium.</p>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li
@@ -240,7 +240,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                   <div class="flex items-center justify-end gap-1 font-display text-lg font-black">
                     <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                   </div>
-                  <div class="text-[11px] font-bold text-black/40">{{ row.acts }} acts</div>
+                  <div class="text-2xs font-bold text-black/40">{{ row.acts }} acts</div>
                 </div>
               </div>
             </li>
@@ -258,7 +258,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Genres</h2>
-            <p class="text-[11px] font-bold text-black/40">Gemiddeld aantal hartjes per act per genre.</p>
+            <p class="text-2xs font-bold text-black/40">Gemiddeld aantal hartjes per act per genre.</p>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li v-for="row in genres" :key="row.genre" class="px-4 py-2.5">
@@ -272,7 +272,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                   <div class="flex items-center justify-end gap-1 font-display text-lg font-black">
                     <HeartMarks :filled="1" size="size-4" />{{ row.avg.toFixed(2) }}
                   </div>
-                  <div class="inline-flex items-center gap-0.5 text-[11px] font-bold text-black/40">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-2.5" /> · {{ row.totalActs }} acts</div>
+                  <div class="inline-flex items-center gap-0.5 text-2xs font-bold text-black/40">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-2.5" /> · {{ row.totalActs }} acts</div>
                 </div>
               </div>
               <div class="mt-1.5 h-2 overflow-hidden rounded-full border-2 border-black bg-white">

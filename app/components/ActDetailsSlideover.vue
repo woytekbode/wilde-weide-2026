@@ -108,7 +108,7 @@ async function copyLink() {
               <!-- uit: hover vult geel voor (toevoegen). aan: geel; op hover
                    zwart met een kruisje (klik = weghalen) -->
               <span
-                class="flex size-5 items-center justify-center rounded-full border-2 border-black text-[10px] font-black transition-colors"
+                class="flex size-5 items-center justify-center rounded-full border-2 border-black text-3xs font-black transition-colors"
                 :class="act.status === 'suggested' ? 'bg-yellow-300 text-black group-hover:bg-black group-hover:text-white' : 'bg-white group-hover:bg-yellow-300'"
               >
                 <template v-if="act.status === 'suggested'">

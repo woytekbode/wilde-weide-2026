@@ -44,7 +44,7 @@ const columns: TableColumn<Act>[] = [
     header: sortableHeader('Tijd'),
     cell: ({ row }) => h('div', { class: 'flex items-center gap-1.5' }, [
       actTimeStatus(row.original, now.value) === 'now'
-        ? h('span', { class: 'rounded-full border-2 border-black bg-black px-1.5 text-[10px] font-black text-white' }, 'NU')
+        ? h('span', { class: 'rounded-full border-2 border-black bg-black px-1.5 text-3xs font-black text-white' }, 'NU')
         : null,
       mute(row.original, h('span', { class: 'font-mono text-xs font-bold whitespace-nowrap' }, `${dayShort(row.original)} ${row.original.time}`))
     ])
@@ -64,7 +64,7 @@ const columns: TableColumn<Act>[] = [
     header: sortableHeader('Genre'),
     cell: ({ row }) => row.original.genre
       ? mute(row.original, h('span', {
-          class: `inline-flex whitespace-nowrap rounded-full border-2 border-black px-1.5 text-[10px] font-bold ${genreColor(row.original.genre)}`
+          class: `inline-flex whitespace-nowrap rounded-full border-2 border-black px-1.5 text-3xs font-bold ${genreColor(row.original.genre)}`
         }, row.original.genre))
       : ''
   },

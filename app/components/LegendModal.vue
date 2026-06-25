@@ -80,7 +80,7 @@ if (import.meta.client) {
             <!-- tip -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <span class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-[10px] font-black">?</span>
+                <span class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-yellow-300 text-3xs font-black">?</span>
               </div>
               <p class="text-sm">
                 <span class="font-bold">Tip</span> kan je zelf geen keuze maken? Laat iemand anders het doen!
@@ -90,7 +90,7 @@ if (import.meta.client) {
             <!-- conflict -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 justify-center">
-                <span class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-red-400 text-[10px] font-black">!</span>
+                <span class="flex size-5 items-center justify-center rounded-full border-2 border-black bg-red-400 text-3xs font-black">!</span>
               </div>
               <p class="text-sm">
                 <span class="font-bold">Conflict</span> aii, jouw favorieten hebben hetzelfde timeslot.
@@ -110,7 +110,7 @@ if (import.meta.client) {
             <!-- nu -->
             <div class="flex items-center gap-4 py-3">
               <div class="flex w-24 shrink-0 items-center">
-                <span class="flex h-5 shrink-0 items-center rounded-full border-2 border-black bg-black px-1 text-[9px] font-black text-white">NU</span>
+                <span class="flex h-5 shrink-0 items-center rounded-full border-2 border-black bg-black px-1 text-4xs font-black text-white">NU</span>
                 <span class="block h-0 grow border-t-[3px] border-black" />
               </div>
               <p class="text-sm">
