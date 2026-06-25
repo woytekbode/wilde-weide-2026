@@ -151,9 +151,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           <div class="text-sm font-bold">actief</div>
         </div>
         <div>
-          <div class="font-display flex items-center justify-center gap-1.5 text-4xl font-black tabular-nums">
-            <UIcon name="i-lucide-heart" class="size-7" />{{ totaal.likes }}
-          </div>
+          <div class="font-display text-4xl font-black tabular-nums">{{ totaal.likes }}</div>
           <div class="text-sm font-bold">hartjes</div>
         </div>
       </div>
@@ -215,7 +213,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
               </div>
               <div class="shrink-0 text-right">
                 <div class="flex items-center justify-end gap-1 font-display text-lg font-black tabular-nums">
-                  <UIcon name="i-lucide-heart" class="size-4" />{{ row.hearts }}
+                  <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                 </div>
                 <div class="text-[11px] font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
               </div>
@@ -240,7 +238,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
               <div class="flex items-center gap-4 text-right tabular-nums">
                 <div>
                   <div class="flex items-center justify-end gap-1 font-display text-lg font-black">
-                    <UIcon name="i-lucide-heart" class="size-4" />{{ row.hearts }}
+                    <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                   </div>
                   <div class="text-[11px] font-bold text-black/40">{{ row.acts }} acts</div>
                 </div>
@@ -272,9 +270,9 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                 <div class="flex-1" />
                 <div class="text-right tabular-nums">
                   <div class="flex items-center justify-end gap-1 font-display text-lg font-black">
-                    <UIcon name="i-lucide-heart" class="size-4" />{{ row.avg.toFixed(2) }}
+                    <HeartMarks :filled="1" size="size-4" />{{ row.avg.toFixed(2) }}
                   </div>
-                  <div class="text-[11px] font-bold text-black/40">{{ row.hearts }} <UIcon name="i-lucide-heart" class="size-2" /> · {{ row.totalActs }} acts</div>
+                  <div class="inline-flex items-center gap-0.5 text-[11px] font-bold text-black/40">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-2.5" /> · {{ row.totalActs }} acts</div>
                 </div>
               </div>
               <div class="mt-1.5 h-2 overflow-hidden rounded-full border-2 border-black bg-white">
