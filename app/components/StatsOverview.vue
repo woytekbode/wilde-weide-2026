@@ -161,13 +161,10 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
       </p>
 
       <template v-else>
-        <!-- Verborgen genres als losse filterkaart, zoals de filterbalk op de
-             andere pagina's; verschijnt zodra je een genre-badge in een rij
-             aantikt. Tik een pill aan om dat genre weer terug te halen. -->
-        <section
-          v-if="verborgenGenres.size"
-          class="ww-card flex flex-wrap items-center gap-1.5 p-3"
-        >
+        <!-- Genre-filterkaart, zoals de filterbalk op de andere pagina's. Altijd
+             zichtbaar: zonder actief filter een hint, anders de verborgen genres
+             als pills. Tik een pill aan om dat genre weer terug te halen. -->
+        <section class="ww-card flex flex-wrap items-center gap-1.5 p-3">
           <button
             v-for="g in verborgenGenres"
             :key="g"
@@ -175,13 +172,16 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
             :class="genreColor(g)"
             @click="toggleGenre(g)"
           >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
+          <p v-if="!verborgenGenres.size" class="text-[11px] font-bold text-black/40">
+            Klik op een genre om te filteren.
+          </p>
         </section>
 
         <!-- Top 10 acts: gewogen hartjes (1/2/3) opgeteld over alle groepen -->
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Acts</h2>
-            <p class="text-[11px] font-bold text-black/40">Aantal hartjes per act. Klik op een genre om te filteren.</p>
+            <p class="text-[11px] font-bold text-black/40">Aantal hartjes per act.</p>
           </div>
 
           <p v-if="!topActs.length" class="px-4 py-3 text-sm font-bold text-black/60">
