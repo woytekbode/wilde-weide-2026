@@ -40,7 +40,10 @@ async function laad() {
   }
 }
 
-onMounted(laad)
+onMounted(() => {
+  herstelVerborgenGenres()
+  laad()
+})
 
 interface Joined { act: Act, hearts: number, groups: number, suggested: number }
 
@@ -57,13 +60,27 @@ const joined = computed<Joined[]>(() => {
 
 // lichte genrefilter: alleen voor de Acts-top-10. Leeg = alles tonen; een genre
 // in de set wordt uit de top-10 weggelaten (Podia/Genres blijven globaal). Je
-// bouwt de filter op door een genre-badge ín een act-rij aan te tikken.
-const verborgenGenres = ref(new Set<string>())
+// bouwt de filter op door een genre-badge ín een act-rij aan te tikken. De keuze
+// blijft per device bewaard (localStorage), net als de verborgen stages.
+const VERBORGEN_GENRES_LS_KEY = 'toppers-hidden-genres'
+const verborgenGenres = useState<Set<string>>('toppers-hidden-genres', () => new Set())
+
 function toggleGenre(g: string) {
   const next = new Set(verborgenGenres.value)
   if (next.has(g)) next.delete(g)
   else next.add(g)
   verborgenGenres.value = next
+  try {
+    localStorage.setItem(VERBORGEN_GENRES_LS_KEY, JSON.stringify([...next]))
+  } catch { /* storage vol/geblokkeerd: filter werkt dan alleen deze sessie */ }
+}
+
+/** verborgen genres terughalen uit localStorage (client-only, na mount) */
+function herstelVerborgenGenres() {
+  try {
+    const opgeslagen = JSON.parse(localStorage.getItem(VERBORGEN_GENRES_LS_KEY) ?? '[]')
+    if (Array.isArray(opgeslagen) && opgeslagen.length) verborgenGenres.value = new Set(opgeslagen)
+  } catch { /* onleesbaar → alle genres zichtbaar */ }
 }
 
 /** top 10 acts; gefilterd op genre, primair op gewogen hartjes, dan op groepen */
