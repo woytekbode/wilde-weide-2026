@@ -163,26 +163,27 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
       </p>
 
       <template v-else>
+        <!-- Verborgen genres als losse filterkaart, zoals de filterbalk op de
+             andere pagina's; verschijnt zodra je een genre-badge in een rij
+             aantikt. Tik een pill aan om dat genre weer terug te halen. -->
+        <section
+          v-if="verborgenGenres.size"
+          class="ww-card flex flex-wrap items-center gap-1.5 p-3"
+        >
+          <button
+            v-for="g in verborgenGenres"
+            :key="g"
+            class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-[10px] font-bold whitespace-nowrap transition hover:brightness-95"
+            :class="genreColor(g)"
+            @click="toggleGenre(g)"
+          >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
+        </section>
+
         <!-- Top 10 acts: gewogen hartjes (1/2/3) opgeteld over alle groepen -->
         <section class="ww-card overflow-hidden">
           <div class="border-b-2 border-black/10 px-4 py-3">
             <h2 class="font-display text-xl font-black">Acts</h2>
             <p class="text-[11px] font-bold text-black/40">Aantal hartjes per act. Klik op een genre om te filteren.</p>
-          </div>
-
-          <!-- filterbalk: verschijnt zodra je een genre-badge in een rij aantikt;
-               tik een pill aan om dat genre weer terug te halen -->
-          <div
-            v-if="verborgenGenres.size"
-            class="flex flex-wrap items-center gap-1.5 border-b-2 border-black/10 px-4 py-2.5"
-          >
-            <button
-              v-for="g in verborgenGenres"
-              :key="g"
-              class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-[10px] font-bold whitespace-nowrap transition hover:brightness-95"
-              :class="genreColor(g)"
-              @click="toggleGenre(g)"
-            >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
           </div>
 
           <p v-if="!topActs.length" class="px-4 py-3 text-sm font-bold text-black/60">
