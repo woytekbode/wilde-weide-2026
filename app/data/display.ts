@@ -107,17 +107,19 @@ export function stageColor(stage: string, programme: Programme = 'muziek'): stri
   return map[stage] ?? 'bg-stone-300'
 }
 
-/** Badge-kleuren per genre-bucket (lichte vulling + zwarte rand) */
+/** Badge-kleuren per genre-bucket (lichte vulling + zwarte rand). Geput uit het
+   stage-palet hierboven, zodat de hele app één samenhangend kleurenschema deelt:
+   elke unieke stage-kleur wordt precies één keer aan een genre toegekend. */
 export const GENRE_COLORS: Record<string, string> = {
-  'cabaret & theater': 'bg-teal-200',
+  'cabaret & theater': 'bg-[#a7c5bb]',
   'electronic & dance': 'bg-lila-300',
   'rock & punk': 'bg-rose-300',
-  'hiphop': 'bg-sky-300',
+  'hiphop': 'bg-[#a3c2cf]',
   'latin & caribbean': 'bg-oker-300',
-  'jazz & klassiek': 'bg-indigo-200',
+  'jazz & klassiek': 'bg-[#e1a87d]',
   'folk & songwriter': 'bg-veld-300',
-  'soul funk & disco': 'bg-orange-300',
-  'pop & indie': 'bg-pink-200'
+  'soul funk & disco': 'bg-[#d07a5a]',
+  'pop & indie': 'bg-[#ddacc0]'
 }
 
 const GENRE_PALETTE = Object.values(GENRE_COLORS)
