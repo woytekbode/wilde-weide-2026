@@ -163,12 +163,14 @@ const mediaan = (xs: number[]): number => {
   return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2
 }
 
-// Per genre een Bayesiaans gemiddelde over de "engaged" acts (acts met ≥1 hartje).
-// We delen de gewogen hartjes door het aantal engaged acts i.p.v. álle
-// geprogrammeerde acts: zo wordt een breed genre (electronic) niet afgestraft op
-// de stille filler-DJ's die niemand liket. Vervolgens trekken we genres met weinig
-// bewijs naar de festivalbrede prior C, zodat een handvol grote namen (hiphop) de
-// ranking niet kaapt. `totalActs` blijft erbij voor de subtekst.
+// Per genre een geregulariseerd gemiddelde over de "engaged" acts (acts met ≥1
+// hartje). We delen de gewogen hartjes door het aantal engaged acts i.p.v. álle
+// geprogrammeerde acts, zodat een breed genre (electronic) niet wordt afgestraft op
+// de stille filler-DJ's die niemand liket. Vervolgens krimpen we dat gemiddelde naar
+// 0 door M "fantoom" acts met 0 hartjes toe te voegen: een genre moet bereik (veel
+// engaged acts × hartjes) opbouwen om hoog te scoren. Zo zakken kleine genres en
+// stijgen genres met veel absolute hartjes — i.p.v. krimpen naar het globale
+// gemiddelde, dat juist kleine genres omhóóg trok. `totalActs` blijft voor de subtekst.
 interface GenreRow { genre: string, hearts: number, engaged: number, totalActs: number, score: number }
 const genres = computed<GenreRow[]>(() => {
   const m = new Map<string, { hearts: number, engaged: number }>()
@@ -182,18 +184,15 @@ const genres = computed<GenreRow[]>(() => {
   const rows = [...m.entries()]
   if (!rows.length) return []
 
-  // C = festivalbreed gemiddelde hartjes per engaged act; M = mediaan van het
-  // aantal engaged acts per genre (grotere M = sterkere trek naar C)
-  const totaalHearts = rows.reduce((s, [, v]) => s + v.hearts, 0)
-  const totaalEngaged = rows.reduce((s, [, v]) => s + v.engaged, 0)
-  const C = totaalHearts / totaalEngaged
+  // M = mediaan engaged acts per genre = het aantal nul-hartjes-fantoomacts dat we
+  // elk genre toevoegen (grotere M = sterkere straf op kleine genres)
   const M = mediaan(rows.map(([, v]) => v.engaged)) || GENRE_SHRINK_FALLBACK
 
   return rows
     .map(([genre, v]) => {
       const totalActs = genreActCount.get(genre) ?? v.engaged
-      // Bayesiaans gemiddelde: (H + M·C) / (n + M), met n = engaged acts
-      const score = (v.hearts + M * C) / (v.engaged + M)
+      // geregulariseerd totaal: H / (engaged + M) — gemiddelde gekrompen naar 0
+      const score = v.hearts / (v.engaged + M)
       return { genre, hearts: v.hearts, engaged: v.engaged, totalActs, score }
     })
     .sort((a, b) => b.score - a.score)
