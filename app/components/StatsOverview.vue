@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LikeAggregateMap, StatsResponse } from '#shared/groep'
-import { buildActs } from '~/composables/useActs'
-import { genreColor } from '~/data/display'
+import { buildActs, useActs } from '~/composables/useActs'
+import { genreColor, stageColor } from '~/data/display'
 import type { Act } from '~/types/program'
 
 // rijen zijn alleen klikbaar binnen een groep (de slideover-scoring hoort niet
@@ -9,11 +9,22 @@ import type { Act } from '~/types/program'
 const { groep } = useGroep()
 const { show } = useActDetails()
 
+// reactieve acts mét de score van déze groep (de groep.client-plugin schrijft de
+// KV-scores in deze state) — zo zie je in de top-10 welke acts je zelf al gaf
+const { acts: programmaActs } = useActs()
+const groepScores = computed(() => {
+  const m = new Map<string, number>()
+  for (const a of programmaActs.value) if (a.score) m.set(a.scoreKey, a.score)
+  return m
+})
+const groepScore = (scoreKey: string): number => groepScores.value.get(scoreKey) ?? 0
+
 const totaal = ref({ groepen: 0, likes: 0, active: 0 })
 const likes = ref<LikeAggregateMap>({})
 const bezig = ref(true)
 const fout = ref('')
 const alleStages = ref(false)
+const alleActs = ref(false)
 
 // muziek-acts (scoreKey === act.id) zodat we de geaggregeerde likes per scoreKey
 // aan podium/genre/artiest kunnen koppelen; statische data, dus buiten reactiviteit
@@ -42,6 +53,7 @@ async function laad() {
 
 onMounted(() => {
   herstelVerborgenGenres()
+  herstelVerborgenStages()
   laad()
 })
 
@@ -83,13 +95,43 @@ function herstelVerborgenGenres() {
   } catch { /* onleesbaar → alle genres zichtbaar */ }
 }
 
-/** top 10 acts; gefilterd op genre, primair op gewogen hartjes, dan op groepen */
+// zelfde lichte filter, maar op podium: tik een stage-badge in een act-rij aan om
+// dat podium uit de Acts-top te laten vallen. Eigen localStorage-key, los van de
+// timetable-stagefilter (useTimetableFilters).
+const VERBORGEN_STAGES_LS_KEY = 'toppers-hidden-stages'
+const verborgenStages = useState<Set<string>>('toppers-hidden-stages', () => new Set())
+
+function toggleStage(s: string) {
+  const next = new Set(verborgenStages.value)
+  if (next.has(s)) next.delete(s)
+  else next.add(s)
+  verborgenStages.value = next
+  try {
+    localStorage.setItem(VERBORGEN_STAGES_LS_KEY, JSON.stringify([...next]))
+  } catch { /* storage vol/geblokkeerd: filter werkt dan alleen deze sessie */ }
+}
+
+/** verborgen podia terughalen uit localStorage (client-only, na mount) */
+function herstelVerborgenStages() {
+  try {
+    const opgeslagen = JSON.parse(localStorage.getItem(VERBORGEN_STAGES_LS_KEY) ?? '[]')
+    if (Array.isArray(opgeslagen) && opgeslagen.length) verborgenStages.value = new Set(opgeslagen)
+  } catch { /* onleesbaar → alle podia zichtbaar */ }
+}
+
+/** top 20 acts; gefilterd op genre, primair op gewogen hartjes, dan op groepen */
 const topActs = computed(() =>
   joined.value
-    .filter(j => !j.act.genre || !verborgenGenres.value.has(j.act.genre))
+    .filter(j => (!j.act.genre || !verborgenGenres.value.has(j.act.genre))
+      && !verborgenStages.value.has(j.act.stage))
     .sort((a, b) => b.hearts - a.hearts || b.groups - a.groups)
-    .slice(0, 10)
+    .slice(0, 20)
 )
+
+// eerste 10 altijd zichtbaar; de volgende 10 staan ingeklapt achter de chevron,
+// net als de extra podia hieronder
+const eersteActs = computed(() => topActs.value.slice(0, 10))
+const extraActs = computed(() => topActs.value.slice(10))
 
 interface StageRow { stage: string, hearts: number, groups: number, acts: number, avg: number }
 const stages = computed<StageRow[]>(() => {
@@ -106,7 +148,10 @@ const stages = computed<StageRow[]>(() => {
     .sort((a, b) => b.hearts - a.hearts)
 })
 
-const zichtbareStages = computed(() => alleStages.value ? stages.value : stages.value.slice(0, 3))
+// eerste 3 altijd zichtbaar; de rest staat ingeklapt in de DOM zodat de
+// uitklap-animatie (grid-rows 0fr→1fr) ze kan onthullen
+const eersteStages = computed(() => stages.value.slice(0, 3))
+const extraStages = computed(() => stages.value.slice(3))
 
 // Per genre op gewogen hartjes gedeeld door het aantal geprogrammeerde acts in
 // dat genre: zo meet je de gemiddelde waardering per act i.p.v. het genre met de
@@ -164,24 +209,34 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         <!-- Genre-filterkaart, zoals de filterbalk op de andere pagina's. Altijd
              zichtbaar: zonder actief filter een hint, anders de verborgen genres
              als pills. Tik een pill aan om dat genre weer terug te halen. -->
-        <section class="ww-card flex flex-wrap items-center gap-1.5 p-3">
-          <button
-            v-for="g in verborgenGenres"
-            :key="g"
-            class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition hover:brightness-95"
-            :class="genreColor(g)"
-            @click="toggleGenre(g)"
-          >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
-          <p v-if="!verborgenGenres.size" class="text-2xs font-bold text-black/40">
-            Klik op een genre om te filteren.
+        <section class="ww-card flex flex-col gap-1.5 p-3">
+          <div v-if="verborgenStages.size" class="flex flex-wrap items-center gap-1.5">
+            <button
+              v-for="s in verborgenStages"
+              :key="s"
+              class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition hover:brightness-95"
+              :class="stageColor(s)"
+              @click="toggleStage(s)"
+            >{{ s }}<UIcon name="i-lucide-x" class="size-3" /></button>
+          </div>
+          <div v-if="verborgenGenres.size" class="flex flex-wrap items-center gap-1.5">
+            <button
+              v-for="g in verborgenGenres"
+              :key="g"
+              class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition hover:brightness-95"
+              :class="genreColor(g)"
+              @click="toggleGenre(g)"
+            >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
+          </div>
+          <p v-if="!verborgenGenres.size && !verborgenStages.size" class="text-2xs font-bold text-black/40">
+            Klik op een podium of genre om te filteren.
           </p>
         </section>
 
         <!-- Top 10 acts: gewogen hartjes (1/2/3) opgeteld over alle groepen -->
         <section class="ww-card overflow-hidden">
-          <div class="border-b-2 border-black/10 px-4 py-3">
-            <h2 class="font-display text-xl font-black">Acts</h2>
-            <p class="text-2xs font-bold text-black/40">Aantal hartjes per act.</p>
+          <div class="border-b-[3px] border-black bg-lila-200 px-4 py-2">
+            <h2 class="font-display text-lg font-black">Acts</h2>
           </div>
 
           <p v-if="!topActs.length" class="px-4 py-3 text-sm font-bold text-black/60">
@@ -190,17 +245,30 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           <TransitionGroup v-else tag="ol" name="topper" class="relative divide-y-2 divide-black/10">
             <component
               :is="groep ? 'button' : 'div'"
-              v-for="(row, i) in topActs"
+              v-for="(row, i) in eersteActs"
               :key="row.act.id"
-              class="flex w-full items-center gap-3 px-4 py-2.5 text-left"
+              class="flex w-full items-start gap-3 px-4 py-2.5 text-left"
               :class="groep ? 'cursor-pointer transition hover:bg-black/5 motion-safe:active:scale-[0.99]' : ''"
               @click="groep && show(row.act)"
             >
-              <span class="w-5 shrink-0 text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 1 }}</span>
+              <span class="w-5 shrink-0 self-center text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 1 }}</span>
               <div class="min-w-0 flex-1">
-                <div class="truncate font-bold">{{ row.act.artist }}</div>
-                <div class="mt-1 flex flex-wrap items-center gap-1.5">
-                  <StageBadge :stage="row.act.stage" size="xs" />
+                <div class="truncate font-bold leading-none">{{ row.act.artist }}</div>
+                <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <HeartMarks
+                    v-if="groepScore(row.act.scoreKey)"
+                    :filled="groepScore(row.act.scoreKey)"
+                    size="size-2.5"
+                    :title="`Jullie hartjes: ${groepScore(row.act.scoreKey)}/3`"
+                  />
+                  <button
+                    type="button"
+                    class="inline-flex cursor-pointer transition hover:brightness-95"
+                    title="Verberg dit podium uit de top-10"
+                    @click.stop="toggleStage(row.act.stage)"
+                  >
+                    <StageBadge :stage="row.act.stage" size="xs" />
+                  </button>
                   <button
                     v-if="row.act.genre"
                     class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
@@ -208,71 +276,166 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                     title="Verberg dit genre uit de top-10"
                     @click.stop="toggleGenre(row.act.genre)"
                   >{{ row.act.genre }}</button>
-                  <span class="text-2xs font-bold text-black/40">{{ row.act.dayKey }}</span>
                 </div>
               </div>
               <div class="shrink-0 text-right">
-                <div class="flex items-center justify-end gap-1 font-display text-lg font-black tabular-nums">
+                <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none tabular-nums">
                   <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                 </div>
-                <div class="text-2xs font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
+                <div class="mt-1.5 text-2xs font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
               </div>
             </component>
           </TransitionGroup>
+
+          <!-- extra acts (11–20): grid-rows 0fr→1fr animeert de hoogte naar auto -->
+          <div
+            v-if="extraActs.length"
+            class="grid motion-safe:transition-[grid-template-rows] motion-safe:duration-300"
+            :class="alleActs ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+          >
+            <div class="overflow-hidden">
+              <TransitionGroup tag="ol" name="topper" class="relative divide-y-2 divide-black/10 border-t-2 border-black/10">
+                <component
+                  :is="groep ? 'button' : 'div'"
+                  v-for="(row, i) in extraActs"
+                  :key="row.act.id"
+                  class="flex w-full items-start gap-3 px-4 py-2.5 text-left"
+                  :class="groep ? 'cursor-pointer transition hover:bg-black/5 motion-safe:active:scale-[0.99]' : ''"
+                  @click="groep && show(row.act)"
+                >
+                  <span class="w-5 shrink-0 self-center text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 11 }}</span>
+                  <div class="min-w-0 flex-1">
+                    <div class="truncate font-bold leading-none">{{ row.act.artist }}</div>
+                    <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      <HeartMarks
+                        v-if="groepScore(row.act.scoreKey)"
+                        :filled="groepScore(row.act.scoreKey)"
+                        size="size-2.5"
+                        :title="`Jullie hartjes: ${groepScore(row.act.scoreKey)}/3`"
+                      />
+                      <StageBadge :stage="row.act.stage" size="xs" />
+                      <button
+                        v-if="row.act.genre"
+                        class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
+                        :class="genreColor(row.act.genre)"
+                        title="Verberg dit genre uit de top-10"
+                        @click.stop="toggleGenre(row.act.genre)"
+                      >{{ row.act.genre }}</button>
+                    </div>
+                  </div>
+                  <div class="shrink-0 text-right">
+                    <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none tabular-nums">
+                      <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
+                    </div>
+                    <div class="mt-1.5 text-2xs font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
+                  </div>
+                </component>
+              </TransitionGroup>
+            </div>
+          </div>
+
+          <button
+            v-if="topActs.length > 10"
+            type="button"
+            class="flex w-full cursor-pointer items-center justify-center border-t-2 border-black/10 py-0.5 text-black transition-colors hover:bg-black/5"
+            :aria-label="alleActs ? 'Toon minder acts' : `Toon alle ${topActs.length} acts`"
+            :title="alleActs ? 'Toon minder' : `Toon alle ${topActs.length} acts`"
+            @click="alleActs = !alleActs"
+          >
+            <UIcon
+              name="i-lucide-chevron-down"
+              class="size-6 motion-safe:transition-transform motion-safe:duration-300"
+              :class="{ 'rotate-180': alleActs }"
+            />
+          </button>
         </section>
 
         <!-- Per podium: opgetelde hartjes, gemiddelde per act, aantal acts -->
         <section class="ww-card overflow-hidden">
-          <div class="border-b-2 border-black/10 px-4 py-3">
-            <h2 class="font-display text-xl font-black">Podia</h2>
-            <p class="text-2xs font-bold text-black/40">Aantal hartjes per podium.</p>
+          <div class="border-b-[3px] border-black bg-oker-200 px-4 py-2">
+            <h2 class="font-display text-lg font-black">Podia</h2>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li
-              v-for="row in zichtbareStages"
+              v-for="row in eersteStages"
               :key="row.stage"
-              class="flex items-center gap-3 px-4 py-2.5"
+              class="flex items-start gap-3 px-4 py-2.5"
             >
               <StageBadge :stage="row.stage" size="sm" />
               <div class="flex-1" />
               <div class="flex items-center gap-4 text-right tabular-nums">
                 <div>
-                  <div class="flex items-center justify-end gap-1 font-display text-lg font-black">
+                  <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none">
                     <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                   </div>
-                  <div class="text-2xs font-bold text-black/40">{{ row.acts }} acts</div>
+                  <div class="mt-1 text-2xs font-bold text-black/40">{{ row.acts }} acts</div>
                 </div>
               </div>
             </li>
           </ul>
+
+          <!-- extra podia: grid-rows 0fr→1fr animeert de hoogte naar auto -->
+          <div
+            v-if="extraStages.length"
+            class="grid motion-safe:transition-[grid-template-rows] motion-safe:duration-300"
+            :class="alleStages ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+          >
+            <div class="overflow-hidden">
+              <ul class="divide-y-2 divide-black/10 border-t-2 border-black/10">
+                <li
+                  v-for="row in extraStages"
+                  :key="row.stage"
+                  class="flex items-start gap-3 px-4 py-2.5"
+                >
+                  <StageBadge :stage="row.stage" size="sm" />
+                  <div class="flex-1" />
+                  <div class="flex items-center gap-4 text-right tabular-nums">
+                    <div>
+                      <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none">
+                        <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
+                      </div>
+                      <div class="mt-1 text-2xs font-bold text-black/40">{{ row.acts }} acts</div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
           <button
             v-if="stages.length > 3"
-            class="w-full border-t-2 border-black/10 py-2 text-xs font-bold text-black/60 transition hover:bg-black/5"
+            type="button"
+            class="flex w-full cursor-pointer items-center justify-center border-t-2 border-black/10 py-0.5 text-black transition-colors hover:bg-black/5"
+            :aria-label="alleStages ? 'Toon minder podia' : `Toon alle ${stages.length} podia`"
+            :title="alleStages ? 'Toon minder' : `Toon alle ${stages.length} podia`"
             @click="alleStages = !alleStages"
           >
-            {{ alleStages ? 'Toon minder' : `Toon alle ${stages.length} podia` }}
+            <UIcon
+              name="i-lucide-chevron-down"
+              class="size-6 motion-safe:transition-transform motion-safe:duration-300"
+              :class="{ 'rotate-180': alleStages }"
+            />
           </button>
         </section>
 
         <!-- Per genre: gemiddeld aantal hartjes per geprogrammeerde act -->
         <section class="ww-card overflow-hidden">
-          <div class="border-b-2 border-black/10 px-4 py-3">
-            <h2 class="font-display text-xl font-black">Genres</h2>
-            <p class="text-2xs font-bold text-black/40">Gemiddeld aantal hartjes per act per genre.</p>
+          <div class="border-b-[3px] border-black bg-veld-200 px-4 py-2">
+            <h2 class="font-display text-lg font-black">Genres</h2>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li v-for="row in genres" :key="row.genre" class="px-4 py-2.5">
-              <div class="flex items-center gap-3">
+              <div class="flex items-start gap-3">
                 <span
                   class="inline-flex items-center rounded-full border-2 border-black px-2 py-0.5 text-xs font-bold whitespace-nowrap"
                   :class="genreColor(row.genre)"
                 >{{ row.genre }}</span>
                 <div class="flex-1" />
                 <div class="text-right tabular-nums">
-                  <div class="flex items-center justify-end gap-1 font-display text-lg font-black">
-                    <HeartMarks :filled="1" size="size-4" />{{ row.avg.toFixed(2) }}
+                  <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none">
+                    <HeartMarks :filled="1" size="size-4" />{{ row.avg.toFixed(2).replace('.', ',') }}
                   </div>
-                  <div class="inline-flex items-center gap-0.5 text-2xs font-bold text-black/40">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-2.5" /> · {{ row.totalActs }} acts</div>
+                  <div class="mt-1 flex items-center justify-end gap-0.5 text-2xs font-bold text-black/40">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-2.5" /> · {{ row.totalActs }} acts</div>
                 </div>
               </div>
               <div class="mt-1.5 h-2 overflow-hidden rounded-full border-2 border-black bg-white">
