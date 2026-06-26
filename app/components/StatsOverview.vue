@@ -338,7 +338,14 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                         size="size-2.5"
                         :title="`Jullie hartjes: ${groepScore(row.act.scoreKey)}/3`"
                       />
-                      <StageBadge :stage="row.act.stage" size="xs" />
+                      <button
+                        type="button"
+                        class="inline-flex cursor-pointer transition hover:brightness-95"
+                        title="Verberg dit podium uit de top-10"
+                        @click.stop="toggleStage(row.act.stage)"
+                      >
+                        <StageBadge :stage="row.act.stage" size="xs" />
+                      </button>
                       <button
                         v-if="row.act.genre"
                         class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
