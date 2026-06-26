@@ -359,7 +359,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
             <li
               v-for="row in eersteStages"
               :key="row.stage"
-              class="flex items-start gap-3 px-4 py-2.5"
+              class="flex items-center gap-3 px-4 py-2.5"
             >
               <StageBadge :stage="row.stage" size="sm" />
               <div class="flex-1" />
@@ -385,7 +385,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                 <li
                   v-for="row in extraStages"
                   :key="row.stage"
-                  class="flex items-start gap-3 px-4 py-2.5"
+                  class="flex items-center gap-3 px-4 py-2.5"
                 >
                   <StageBadge :stage="row.stage" size="sm" />
                   <div class="flex-1" />
