@@ -71,7 +71,7 @@ async function kopieerLink() {
     <div v-if="!gemaakt" class="ww-card space-y-4 p-5">
       <h2 class="font-display text-3xl font-black leading-tight">Met wie ga jij?</h2>
       <p class="text-sm font-bold">
-        Verzin een nieuwe groepsnaam of vul een bestaande in.
+        Verzin een nieuwe groepsnaam of vul een bestaande in. De groepsnaam is je toegangskaartje dus verzin iets unieks!
       </p>
       <form class="space-y-3" @submit.prevent="verstuur">
         <input
