@@ -18,6 +18,11 @@ useHead({
 // groep via useTent).
 const card = ref<HTMLElement | null>(null)
 const image = ref<HTMLImageElement | null>(null)
+// De server rendert de kaart in zijn reactieve beginstand (scale 1, linksboven); de
+// echte openingsstand wordt pas client-side in fit() berekend. Houd de kaart daarom
+// onzichtbaar tot die eerste fit gedraaid is en fade hem dan in — anders zie je eerst
+// de ongefitte stand en springt hij na hydratie naar zijn plek.
+const ready = ref(false)
 const scale = ref(1)
 const tx = ref(0)
 const ty = ref(0)
@@ -133,6 +138,7 @@ function fit() {
   scale.value = startScale
   tx.value = bounds(scale.value).txHi
   ty.value = (r.height - baseImgHeight() * scale.value) / 2
+  ready.value = true
 }
 
 function midpoint(t0: Touch, t1: Touch) {
@@ -308,7 +314,11 @@ onScopeDispose(() => {
       @mouseleave="onMouseLeave"
     >
       <!-- wrapper draagt de transform, zodat afbeelding én tent samen mee zoomen/pannen -->
-      <div class="relative origin-top-left" :style="{ transform }">
+      <div
+        class="relative origin-top-left transition-opacity duration-700 ease-out"
+        :class="ready ? 'opacity-100' : 'opacity-0'"
+        :style="{ transform }"
+      >
         <img
           ref="image"
           src="/wildeweide-plattegrond.webp"
