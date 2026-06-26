@@ -46,6 +46,10 @@ const pageColor = computed<string>(() => {
   return (route.meta.wwBg as string) ?? 'lila'
 })
 
+// Fullscreen-modus (alleen de kaartpagina): op mobiel verdwijnt de header en vult
+// de pagina het scherm (zie de max-lg:-overrides hieronder). Desktop blijft gewoon.
+const fullscreen = computed(() => route.meta.wwFullscreen === true)
+
 // Geef de paginakleur ook aan <html> door: --ww-page-bg zodat de scrollbar-gutter
 // (in main.css) dezelfde achtergrondkleur krijgt, én --ww-accent zodat overlays die
 // uit de layout-div worden geteleporteerd (de slideover, in <body>) de paginakleur
@@ -59,11 +63,11 @@ useHead({
 
 <template>
   <div
-    class="min-h-screen pb-24 transition-colors duration-500 lg:pb-10"
-    :class="BG_CLASSES[pageColor]"
+    class="min-h-screen transition-colors duration-500"
+    :class="[BG_CLASSES[pageColor], fullscreen ? 'flex h-dvh min-h-0 flex-col overflow-hidden' : 'pb-24 lg:pb-10']"
     :style="{ '--ww-accent': ACCENT_VARS[pageColor] }"
   >
-    <header class="mx-auto max-w-7xl px-4 pt-5 pb-4 lg:px-8">
+    <header class="mx-auto max-w-7xl shrink-0 px-4 pt-5 pb-4 lg:px-8" :class="{ 'max-lg:hidden': fullscreen }">
       <!-- titelrij + nav delen één regel en lijnen onderaan uit; de pilhoogte
            valt samen met de teksthoogte, dus de bovenkanten lopen ook gelijk -->
       <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 lg:flex-nowrap">
@@ -103,12 +107,15 @@ useHead({
       </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-4 lg:px-8">
+    <main
+      class="mx-auto"
+      :class="fullscreen ? 'max-w-none flex-1 min-h-0 px-0' : 'max-w-7xl px-4 lg:px-8'"
+    >
       <slot />
     </main>
 
     <!-- mobiele onderbalk -->
-    <nav v-if="groep" class="fixed inset-x-0 bottom-0 z-40 flex justify-around border-t-[3px] border-black bg-white py-1.5 lg:hidden">
+    <nav v-if="groep" class="fixed inset-x-0 bottom-0 z-40 flex justify-around border-t-[3px] border-black bg-white py-1.5 lg:hidden" :class="{ 'max-lg:static max-lg:z-auto': fullscreen }">
       <NuxtLink
         v-for="item in nav"
         :key="item.to"

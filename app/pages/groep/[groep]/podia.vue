@@ -2,7 +2,7 @@
 import stagesData from '~/data/wildeweide-stages.json'
 import { DAY_META } from '~/data/display'
 
-definePageMeta({ wwBg: 'lila' })
+definePageMeta({ wwBg: 'oker' })
 
 const days = stagesData.days.map(d => ({
   ...d,

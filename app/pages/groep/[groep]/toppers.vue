@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ wwBg: 'lila' })
+definePageMeta({ wwBg: 'veld' })
 </script>
 
 <template>

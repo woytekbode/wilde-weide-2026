@@ -1,26 +1,40 @@
 <script setup lang="ts">
-definePageMeta({ wwBg: 'oker' })
+definePageMeta({ wwBg: 'lila', wwFullscreen: true })
 
-// Pinch-to-zoom dat alleen de plattegrond-kaart schaalt (niet de pagina).
-// Twee vingers = zoomen rond het midden van de knijp; één vinger = slepen
-// zolang ingezoomd; een schone tik plaatst (of verplaatst) de tent.
+// De plattegrond is verreweg de zwaarste asset van de pagina; laat de browser hem
+// meteen (al tijdens het laden van de HTML) ophalen i.p.v. pas nadat de component
+// hydrateert, zodat de kaart op mobiel sneller in zijn standstand verschijnt.
+useHead({
+  link: [{ rel: 'preload', as: 'image', href: '/wildeweide-plattegrond.webp', type: 'image/webp', fetchpriority: 'high' }]
+})
+
+// Pinch-to-zoom + vrij verslepen van alléén de plattegrond (niet de pagina). Eén
+// systeem voor mobiel én desktop: de kaart leeft in een 'viewport' (schermvullend
+// en edge-to-edge onder de header, op elk formaat). Op een staand scherm (telefoon) opent
+// hij beeldvullend en kun je uitknijpen tot de héle kaart past (beeldbreedte =
+// schermbreedte); op een breed venster (desktop) opent hij meteen op de hele kaart,
+// gecentreerd. Slepen mag in elke richting; bij loslaten veert de kaart terug naar
+// de dichtstbijzijnde legale stand. Een schone tik plaatst de tent (gedeeld per
+// groep via useTent).
 const card = ref<HTMLElement | null>(null)
+const image = ref<HTMLImageElement | null>(null)
 const scale = ref(1)
 const tx = ref(0)
 const ty = ref(0)
 
-const MIN = 1
-const MAX = 4
+// Zoomgrenzen (reactief): MIN = 'contain' — de schaal waarbij de héle kaart past
+// (≤1, dus beeldbreedte = vensterbreedte). MAX = 4× de openingsstand. startScale is
+// de openingsstand: beeldvullend op een staand scherm, anders meteen 'contain'.
+const MIN = ref(1)
+const MAX = ref(4)
+let startScale = 1
 const TAP_SLOP = 10 // px beweging waaronder een touch nog als 'tik' telt
+const imgAspect = ref(2331 / 3108) // echte plattegrond (0.75), fallback tot de afbeelding geladen is
 
-// Tent-marker: gedeeld per groep (KV via useTent), opgeslagen als fractie
-// (0..1) van de afbeelding, zodat hij onafhankelijk van zoom/formaat op
-// dezelfde plek blijft, mee schaalt én voor iedereen in de groep gelijk is.
-const { tent, setTent, clearTent } = useTent()
+const { tent, setTent } = useTent()
 
-// Zolang we op fit (scale 1) staan mag de pagina verticaal scrollen met één
-// vinger; ingezoomd nemen we alle touch-gestures zelf over (slepen/knijpen).
-const touchAction = computed(() => (scale.value > MIN ? 'none' : 'pan-y'))
+// Zonder geplaatste tent staat de marker midden op de kaart, klaar om te verplaatsen.
+const tentPos = computed(() => tent.value ?? { fx: 0.5, fy: 0.5 })
 
 const transform = computed(
   () => `translate(${tx.value}px, ${ty.value}px) scale(${scale.value})`
@@ -35,6 +49,7 @@ let moved = false
 let pinched = false
 let dragging = false
 let mouseMoved = false
+let raf = 0
 
 function rect() {
   return card.value!.getBoundingClientRect()
@@ -44,11 +59,80 @@ function clamp01(v: number) {
   return Math.min(1, Math.max(0, v))
 }
 
-// Houd de afbeelding binnen de kaart (origin staat linksboven, zie template).
-function clamp() {
+// Basis(on-geschaalde) beeldhoogte: de echte gerenderde hoogte van de <img> (die op
+// w-full staat), met de aspect-ratio als fallback voordat de afbeelding geladen is.
+function baseImgHeight() {
+  return image.value?.offsetHeight || rect().width / imgAspect.value
+}
+
+// Herbereken de zoomgrenzen + openingsstand voor het huidige venster-/beeldformaat.
+function recompute() {
   const r = rect()
-  tx.value = Math.min(0, Math.max(r.width * (1 - scale.value), tx.value))
-  ty.value = Math.min(0, Math.max(r.height * (1 - scale.value), ty.value))
+  const fillHeight = r.height / baseImgHeight() // schaal die de vensterhoogte vult
+  MIN.value = Math.min(1, fillHeight)           // contain: hele kaart past (breedte = vensterbreedte)
+  // Staand venster (telefoon, volscherm) opent beeldvullend; een breed venster (desktop) op de hele kaart.
+  startScale = r.width < r.height ? fillHeight : MIN.value
+  MAX.value = startScale * 4                     // tot 4× de openingsstand inzoomen
+}
+
+// Legale positiegrenzen bij schaal s. In een richting waar het beeld gróter is dan
+// het venster mag het schuiven (binnen beeld blijven); is het kléiner, dan klemmen
+// we het gecentreerd (geen schuiven in de letterbox).
+function bounds(s: number) {
+  const r = rect()
+  const sx = r.width - r.width * s          // >0 ⇒ beeld smaller dan venster
+  const sy = r.height - baseImgHeight() * s // >0 ⇒ beeld lager dan venster
+  return {
+    txLo: sx < 0 ? sx : sx / 2, txHi: sx < 0 ? 0 : sx / 2,
+    tyLo: sy < 0 ? sy : sy / 2, tyHi: sy < 0 ? 0 : sy / 2
+  }
+}
+
+// Direct naar een geldige stand klemmen (zonder animatie) — voor zoom en resize.
+function clampNow() {
+  scale.value = Math.min(MAX.value, Math.max(MIN.value, scale.value))
+  const b = bounds(scale.value)
+  tx.value = Math.min(b.txHi, Math.max(b.txLo, tx.value))
+  ty.value = Math.min(b.tyHi, Math.max(b.tyLo, ty.value))
+}
+
+// Soepel naar de dichtstbijzijnde legale stand veren (na een sleep/knijp loslaten).
+function animateTo(ts: number, ttx: number, tty: number) {
+  cancelAnimationFrame(raf)
+  const s0 = scale.value
+  const x0 = tx.value
+  const y0 = ty.value
+  const t0 = performance.now()
+  const dur = 220
+  const ease = (p: number) => 1 - Math.pow(1 - p, 3) // easeOutCubic
+  function step(now: number) {
+    const p = Math.min(1, (now - t0) / dur)
+    const e = ease(p)
+    scale.value = s0 + (ts - s0) * e
+    tx.value = x0 + (ttx - x0) * e
+    ty.value = y0 + (tty - y0) * e
+    if (p < 1) raf = requestAnimationFrame(step)
+  }
+  raf = requestAnimationFrame(step)
+}
+
+function settle() {
+  const ts = Math.min(MAX.value, Math.max(MIN.value, scale.value))
+  const b = bounds(ts)
+  animateTo(ts, Math.min(b.txHi, Math.max(b.txLo, tx.value)), Math.min(b.tyHi, Math.max(b.tyLo, ty.value)))
+}
+
+// Openingsstand: beeldvullend (staand scherm) of de hele kaart (breed venster). De
+// kaart wordt zo ver mogelijk naar links gelegd: is er horizontale speling (telefoon,
+// beeld breder dan het scherm) dan valt de linkerrand van de kaart samen met de
+// linkerrand van het scherm; is er geen speling (desktop, paarse rand opzij) dan staat
+// hij gecentreerd. Verticaal gecentreerd (op een telefoon vult hij precies de hoogte).
+function fit() {
+  recompute()
+  const r = rect()
+  scale.value = startScale
+  tx.value = bounds(scale.value).txHi
+  ty.value = (r.height - baseImgHeight() * scale.value) / 2
 }
 
 function midpoint(t0: Touch, t1: Touch) {
@@ -64,6 +148,7 @@ function dist(t0: Touch, t1: Touch) {
 }
 
 function onTouchStart(e: TouchEvent) {
+  cancelAnimationFrame(raf) // een lopende terugveer-animatie onderbreken
   if (e.touches.length === 2) {
     pinched = true
     lastDist = dist(e.touches[0]!, e.touches[1]!)
@@ -83,32 +168,29 @@ function onTouchMove(e: TouchEvent) {
     e.preventDefault()
     const d = dist(e.touches[0]!, e.touches[1]!)
     const mid = midpoint(e.touches[0]!, e.touches[1]!)
-    const next = Math.min(MAX, Math.max(MIN, (scale.value * d) / lastDist))
+    const next = Math.min(MAX.value, Math.max(MIN.value, (scale.value * d) / lastDist))
     const factor = next / scale.value
 
     // mee-pannen met het verschuivende midden ...
     tx.value += mid.x - lastMid.x
     ty.value += mid.y - lastMid.y
-    // ... en inzoomen rond dat midden
+    // ... en inzoomen rond dat midden (positie vrij; terugveren gebeurt bij loslaten)
     tx.value = mid.x - (mid.x - tx.value) * factor
     ty.value = mid.y - (mid.y - ty.value) * factor
 
     scale.value = next
     lastDist = d
     lastMid = mid
-    clamp()
   } else if (e.touches.length === 1) {
     const t = e.touches[0]!
     if (Math.hypot(t.clientX - tapStart.x, t.clientY - tapStart.y) > TAP_SLOP) {
       moved = true
     }
-    if (scale.value > MIN) {
-      e.preventDefault()
-      tx.value += t.clientX - lastSingle.x
-      ty.value += t.clientY - lastSingle.y
-      lastSingle = { x: t.clientX, y: t.clientY }
-      clamp()
-    }
+    // vrij verslepen in elke richting (overscroll mag; veert terug bij loslaten)
+    e.preventDefault()
+    tx.value += t.clientX - lastSingle.x
+    ty.value += t.clientY - lastSingle.y
+    lastSingle = { x: t.clientX, y: t.clientY }
   }
 }
 
@@ -125,27 +207,28 @@ function onTouchEnd(e: TouchEvent) {
     lastMid = midpoint(e.touches[0]!, e.touches[1]!)
     return
   }
-  // alle vingers los: was dit een schone tik (geen sleep/knijp)? plaats de tent
-  if (!moved && !pinched && Date.now() - tapTime < 700) {
-    placeTent(tapStart.x, tapStart.y)
-  }
+  // alle vingers los: schone tik plaatst de tent, anders terugveren naar legale stand
+  if (!moved && !pinched && Date.now() - tapTime < 700) placeTent(tapStart.x, tapStart.y)
+  else settle()
 }
 
 // --- Muis (desktop): scroll = zoom, slepen = pannen, klik = tent plaatsen ---
 function onWheel(e: WheelEvent) {
   e.preventDefault()
+  cancelAnimationFrame(raf)
   const r = rect()
   const cx = e.clientX - r.left
   const cy = e.clientY - r.top
-  const next = Math.min(MAX, Math.max(MIN, scale.value * (e.deltaY < 0 ? 1.1 : 1 / 1.1)))
+  const next = Math.min(MAX.value, Math.max(MIN.value, scale.value * (e.deltaY < 0 ? 1.1 : 1 / 1.1)))
   const factor = next / scale.value
   tx.value = cx - (cx - tx.value) * factor
   ty.value = cy - (cy - ty.value) * factor
   scale.value = next
-  clamp()
+  clampNow()
 }
 
 function onMouseDown(e: MouseEvent) {
+  cancelAnimationFrame(raf)
   dragging = true
   mouseMoved = false
   tapStart = { x: e.clientX, y: e.clientY }
@@ -157,42 +240,64 @@ function onMouseMove(e: MouseEvent) {
   if (Math.hypot(e.clientX - tapStart.x, e.clientY - tapStart.y) > TAP_SLOP) {
     mouseMoved = true
   }
-  if (scale.value > MIN) {
-    tx.value += e.clientX - lastSingle.x
-    ty.value += e.clientY - lastSingle.y
-    lastSingle = { x: e.clientX, y: e.clientY }
-    clamp()
-  }
+  tx.value += e.clientX - lastSingle.x
+  ty.value += e.clientY - lastSingle.y
+  lastSingle = { x: e.clientX, y: e.clientY }
 }
 
 function onMouseUp(e: MouseEvent) {
   if (!dragging) return
   dragging = false
-  if (!mouseMoved) placeTent(e.clientX, e.clientY)
+  if (mouseMoved) settle()
+  else placeTent(e.clientX, e.clientY)
 }
 
-// Reken schermcoördinaten terug naar een fractie van de afbeelding (inverse
-// van translate+scale, origin linksboven) en zet daar de tent neer.
+function onMouseLeave() {
+  if (!dragging) return
+  dragging = false
+  if (mouseMoved) settle()
+}
+
+// Reken schermcoördinaten terug naar een fractie van de afbeelding (inverse van
+// translate+scale, origin linksboven) en zet daar de tent neer.
 function placeTent(clientX: number, clientY: number) {
   const r = rect()
   const px = (clientX - r.left - tx.value) / scale.value
   const py = (clientY - r.top - ty.value) / scale.value
-  setTent(clamp01(px / r.width), clamp01(py / r.height))
+  setTent(clamp01(px / r.width), clamp01(py / baseImgHeight()))
 }
+
+// Echte aspect uit de geladen afbeelding overnemen en de kaart opnieuw schermvullend zetten.
+function onImgLoad() {
+  const img = image.value
+  if (img?.naturalWidth && img.naturalHeight) imgAspect.value = img.naturalWidth / img.naturalHeight
+  fit()
+}
+
+let ro: ResizeObserver | undefined
+onMounted(() => {
+  fit()
+  ro = new ResizeObserver(() => {
+    recompute()
+    clampNow()
+  })
+  if (card.value) ro.observe(card.value)
+})
+onScopeDispose(() => {
+  ro?.disconnect()
+  cancelAnimationFrame(raf)
+})
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- intro -->
-    <section class="ww-card p-4">
-      <p class="text-sm font-bold">Waar werpen jullie je tentjes op?</p>
-    </section>
-
-    <!-- plattegrond: knijp met twee vingers om te zoomen, tik om je tent te plaatsen -->
+  <div class="h-full">
+    <!-- plattegrond: knijp/scroll om te zoomen, sleep om te verschuiven, tik om je
+         tent te plaatsen. Eén venster voor mobiel én desktop: schermvullend en
+         edge-to-edge onder de header, zonder kaart/rand — de paginakleur loopt door
+         in de paarse rand van de afbeelding. -->
     <section
       ref="card"
-      class="ww-card relative cursor-tent overflow-hidden active:cursor-grabbing"
-      :style="{ touchAction }"
+      class="relative h-full w-full cursor-tent touch-none overflow-hidden active:cursor-grabbing"
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
@@ -200,25 +305,28 @@ function placeTent(clientX: number, clientY: number) {
       @mousedown="onMouseDown"
       @mousemove="onMouseMove"
       @mouseup="onMouseUp"
-      @mouseleave="dragging = false"
+      @mouseleave="onMouseLeave"
     >
       <!-- wrapper draagt de transform, zodat afbeelding én tent samen mee zoomen/pannen -->
       <div class="relative origin-top-left" :style="{ transform }">
         <img
-          src="/wildeweide-plattegrond.jpg"
+          ref="image"
+          src="/wildeweide-plattegrond.webp"
           alt="Plattegrond Wilde Weide 2026 — Netl de Wildste Tuin"
           class="block w-full select-none"
           draggable="false"
-          loading="lazy"
+          fetchpriority="high"
+          decoding="async"
+          @load="onImgLoad"
         >
         <!-- marker als SVG met breedte in % van de kaart, zodat de verhouding
              marker:kaart op elk schermformaat gelijk blijft (clamp houdt 'm op
-             een klein scherm leesbaar). Schaalt daarnaast mee met de zoom omdat
-             hij in de getransformeerde wrapper zit. -->
+             een klein scherm leesbaar). Schaalt mee met de zoom omdat hij in de
+             getransformeerde wrapper zit. -->
         <div
-          v-if="tent"
-          class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
-          :style="{ left: `${tent.fx * 100}%`, top: `${tent.fy * 100}%`, width: 'clamp(16px, 5%, 50px)' }"
+          class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 transition-opacity"
+          :class="tent ? '' : 'opacity-60'"
+          :style="{ left: `${tentPos.fx * 100}%`, top: `${tentPos.fy * 100}%`, width: 'clamp(16px, 5%, 50px)' }"
         >
           <svg viewBox="0 0 32 32" class="block w-full drop-shadow-sm">
             <circle cx="16" cy="16" r="14" fill="#a48dbe" stroke="#000" stroke-width="2" />
@@ -231,40 +339,6 @@ function placeTent(clientX: number, clientY: number) {
           </svg>
         </div>
       </div>
-
-      <!-- dock rechtsboven (buiten de transform): de 'thuisbasis' van de tent.
-           Niet geplaatst = gevuld tent-dock; geplaatst = leeg stippel-dock met X,
-           tik erop om de tent terug naar het dock te halen. -->
-      <div
-        class="absolute right-3 top-3 z-10 cursor-default"
-        @touchstart.stop
-        @touchmove.stop
-        @touchend.stop
-      >
-        <div
-          v-if="!tent"
-          class="flex size-12 items-center justify-center rounded-full border-[3px] border-black bg-lila-500 shadow-md"
-        >
-          <UIcon name="i-lucide-tent" class="size-7 text-black" />
-        </div>
-        <button
-          v-else
-          type="button"
-          class="flex size-12 cursor-pointer items-center justify-center rounded-full border-[3px] border-dotted border-black/50 bg-white/60 shadow-md transition-transform motion-safe:active:scale-95"
-          aria-label="Tent terughalen"
-          @click="clearTent()"
-        >
-          <UIcon name="i-lucide-x" class="size-6 text-black" />
-        </button>
-      </div>
-
-      <!-- hint zolang er nog geen tent staat -->
-      <p
-        v-if="!tent"
-        class="pointer-events-none absolute inset-x-0 bottom-3 z-10 mx-auto w-fit rounded-full border-2 border-black bg-white px-3 py-1 text-xs font-bold shadow-md"
-      >
-        Tik op de kaart om je tent te plaatsen
-      </p>
     </section>
   </div>
 </template>
