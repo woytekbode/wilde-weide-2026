@@ -253,7 +253,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
             >
               <span class="w-5 shrink-0 self-center text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 1 }}</span>
               <div class="min-w-0 flex-1">
-                <div class="truncate font-bold leading-none">{{ row.act.artist }}</div>
+                <div class="truncate font-bold leading-tight">{{ row.act.artist }}</div>
                 <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
                   <HeartMarks
                     v-if="groepScore(row.act.scoreKey)"
@@ -305,7 +305,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                 >
                   <span class="w-5 shrink-0 self-center text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 11 }}</span>
                   <div class="min-w-0 flex-1">
-                    <div class="truncate font-bold leading-none">{{ row.act.artist }}</div>
+                    <div class="truncate font-bold leading-tight">{{ row.act.artist }}</div>
                     <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <HeartMarks
                         v-if="groepScore(row.act.scoreKey)"
