@@ -153,28 +153,53 @@ const stages = computed<StageRow[]>(() => {
 const eersteStages = computed(() => stages.value.slice(0, 3))
 const extraStages = computed(() => stages.value.slice(3))
 
-// Per genre op gewogen hartjes gedeeld door het aantal geprogrammeerde acts in
-// dat genre: zo meet je de gemiddelde waardering per act i.p.v. het genre met de
-// meeste acts. `totalActs` staat erbij zodat je kleine (wisselvallige) genres ziet.
-interface GenreRow { genre: string, hearts: number, likedActs: number, totalActs: number, avg: number }
+// smoothing-gewicht als de mediaan ontaardt (bv. alle genres één engaged act)
+const GENRE_SHRINK_FALLBACK = 3
+
+const mediaan = (xs: number[]): number => {
+  if (!xs.length) return 0
+  const s = [...xs].sort((a, b) => a - b)
+  const mid = Math.floor(s.length / 2)
+  return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2
+}
+
+// Per genre een Bayesiaans gemiddelde over de "engaged" acts (acts met ≥1 hartje).
+// We delen de gewogen hartjes door het aantal engaged acts i.p.v. álle
+// geprogrammeerde acts: zo wordt een breed genre (electronic) niet afgestraft op
+// de stille filler-DJ's die niemand liket. Vervolgens trekken we genres met weinig
+// bewijs naar de festivalbrede prior C, zodat een handvol grote namen (hiphop) de
+// ranking niet kaapt. `totalActs` blijft erbij voor de subtekst.
+interface GenreRow { genre: string, hearts: number, engaged: number, totalActs: number, score: number }
 const genres = computed<GenreRow[]>(() => {
-  const m = new Map<string, { hearts: number, likedActs: number }>()
+  const m = new Map<string, { hearts: number, engaged: number }>()
   for (const j of joined.value) {
-    if (!j.act.genre) continue
-    const g = m.get(j.act.genre) ?? { hearts: 0, likedActs: 0 }
+    if (!j.act.genre || j.hearts <= 0) continue
+    const g = m.get(j.act.genre) ?? { hearts: 0, engaged: 0 }
     g.hearts += j.hearts
-    g.likedActs += 1
+    g.engaged += 1
     m.set(j.act.genre, g)
   }
-  return [...m.entries()]
+  const rows = [...m.entries()]
+  if (!rows.length) return []
+
+  // C = festivalbreed gemiddelde hartjes per engaged act; M = mediaan van het
+  // aantal engaged acts per genre (grotere M = sterkere trek naar C)
+  const totaalHearts = rows.reduce((s, [, v]) => s + v.hearts, 0)
+  const totaalEngaged = rows.reduce((s, [, v]) => s + v.engaged, 0)
+  const C = totaalHearts / totaalEngaged
+  const M = mediaan(rows.map(([, v]) => v.engaged)) || GENRE_SHRINK_FALLBACK
+
+  return rows
     .map(([genre, v]) => {
-      const totalActs = genreActCount.get(genre) ?? v.likedActs
-      return { genre, hearts: v.hearts, likedActs: v.likedActs, totalActs, avg: v.hearts / totalActs }
+      const totalActs = genreActCount.get(genre) ?? v.engaged
+      // Bayesiaans gemiddelde: (H + M·C) / (n + M), met n = engaged acts
+      const score = (v.hearts + M * C) / (v.engaged + M)
+      return { genre, hearts: v.hearts, engaged: v.engaged, totalActs, score }
     })
-    .sort((a, b) => b.avg - a.avg)
+    .sort((a, b) => b.score - a.score)
 })
-// bar relatief aan het sterkste genre (avg is geen fractie van een geheel)
-const maxGenreAvg = computed(() => Math.max(0, ...genres.value.map(g => g.avg)))
+// bar relatief aan het sterkste genre (score is geen fractie van een geheel)
+const maxGenreScore = computed(() => Math.max(0, ...genres.value.map(g => g.score)))
 
 const leeg = computed(() => joined.value.length === 0)
 const pct = (n: number) => `${Math.round(n * 100)}%`
@@ -418,28 +443,24 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           </button>
         </section>
 
-        <!-- Per genre: gemiddeld aantal hartjes per geprogrammeerde act -->
+        <!-- Per genre: balk = relatieve Bayesiaanse score (kwaliteit × bereik over
+             de engaged acts); de tekst toont de rauwe cijfers erachter -->
         <section class="ww-card overflow-hidden">
           <div class="border-b-[3px] border-black bg-veld-200 px-4 py-2">
             <h2 class="font-display text-lg font-black">Genres</h2>
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li v-for="row in genres" :key="row.genre" class="px-4 py-2.5">
-              <div class="flex items-start gap-3">
+              <div class="flex items-center gap-3">
                 <span
                   class="inline-flex items-center rounded-full border-2 border-black px-2 py-0.5 text-xs font-bold whitespace-nowrap"
                   :class="genreColor(row.genre)"
                 >{{ row.genre }}</span>
                 <div class="flex-1" />
-                <div class="text-right tabular-nums">
-                  <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none">
-                    <HeartMarks :filled="1" size="size-4" />{{ row.avg.toFixed(2).replace('.', ',') }}
-                  </div>
-                  <div class="mt-1 flex items-center justify-end gap-0.5 text-2xs font-bold text-black/40">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-2.5" /> · {{ row.totalActs }} acts</div>
-                </div>
+                <div class="flex items-center gap-0.5 text-xs font-bold text-black/60 tabular-nums">{{ row.hearts }} <HeartMarks :filled="1" inherit size="size-3" /> · {{ row.totalActs }} acts</div>
               </div>
               <div class="mt-1.5 h-2 overflow-hidden rounded-full border-2 border-black bg-white">
-                <div class="h-full" :class="genreColor(row.genre)" :style="{ width: pct(maxGenreAvg ? row.avg / maxGenreAvg : 0) }" />
+                <div class="h-full" :class="genreColor(row.genre)" :style="{ width: pct(maxGenreScore ? row.score / maxGenreScore : 0) }" />
               </div>
             </li>
           </ul>
