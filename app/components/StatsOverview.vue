@@ -239,7 +239,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
             <button
               v-for="s in verborgenStages"
               :key="s"
-              class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition hover:brightness-95"
+              class="inline-flex cursor-pointer items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition-transform hover:scale-95 motion-safe:active:scale-95"
               :class="stageColor(s)"
               @click="toggleStage(s)"
             >{{ s }}<UIcon name="i-lucide-x" class="size-3" /></button>
@@ -248,7 +248,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
             <button
               v-for="g in verborgenGenres"
               :key="g"
-              class="inline-flex items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition hover:brightness-95"
+              class="inline-flex cursor-pointer items-center gap-0.5 rounded-full border-2 border-black py-px pl-1.5 pr-1 text-3xs font-bold whitespace-nowrap transition-transform hover:scale-95 motion-safe:active:scale-95"
               :class="genreColor(g)"
               @click="toggleGenre(g)"
             >{{ g }}<UIcon name="i-lucide-x" class="size-3" /></button>
@@ -288,7 +288,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                   />
                   <button
                     type="button"
-                    class="inline-flex cursor-pointer transition hover:brightness-95"
+                    class="inline-flex cursor-pointer transition-transform hover:scale-95 motion-safe:active:scale-95"
                     title="Verberg dit podium uit de top-10"
                     @click.stop="toggleStage(row.act.stage)"
                   >
@@ -296,7 +296,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                   </button>
                   <button
                     v-if="row.act.genre"
-                    class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
+                    class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition-transform hover:scale-95 motion-safe:active:scale-95 cursor-pointer"
                     :class="genreColor(row.act.genre)"
                     title="Verberg dit genre uit de top-10"
                     @click.stop="toggleGenre(row.act.genre)"
@@ -340,7 +340,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                       />
                       <button
                         type="button"
-                        class="inline-flex cursor-pointer transition hover:brightness-95"
+                        class="inline-flex cursor-pointer transition-transform hover:scale-95 motion-safe:active:scale-95"
                         title="Verberg dit podium uit de top-10"
                         @click.stop="toggleStage(row.act.stage)"
                       >
@@ -348,7 +348,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                       </button>
                       <button
                         v-if="row.act.genre"
-                        class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition hover:brightness-95 cursor-pointer"
+                        class="inline-flex items-center rounded-full border-2 border-black px-1.5 text-3xs font-bold whitespace-nowrap transition-transform hover:scale-95 motion-safe:active:scale-95 cursor-pointer"
                         :class="genreColor(row.act.genre)"
                         title="Verberg dit genre uit de top-10"
                         @click.stop="toggleGenre(row.act.genre)"
