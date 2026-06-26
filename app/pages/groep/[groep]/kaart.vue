@@ -336,15 +336,25 @@ onScopeDispose(() => {
         <div
           class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 transition-opacity"
           :class="tent ? '' : 'opacity-60'"
-          :style="{ left: `${tentPos.fx * 100}%`, top: `${tentPos.fy * 100}%`, width: 'clamp(16px, 5%, 50px)' }"
+          :style="{ left: `${tentPos.fx * 100}%`, top: `${tentPos.fy * 100}%`, width: 'clamp(20px, 6.5%, 64px)' }"
         >
-          <svg viewBox="0 0 32 32" class="block w-full drop-shadow-sm">
-            <circle cx="16" cy="16" r="14" fill="#a48dbe" stroke="#000" stroke-width="2" />
-            <g transform="translate(5.2 5.2) scale(0.9)" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3.5 21 14 3" />
-              <path d="M20.5 21 10 3" />
-              <path d="M15.5 21 12 15l-3.5 6" />
-              <path d="M2 21h20" />
+          <!-- alleen het tent-icoon (geen cirkel): zwart icoon met een witte
+               onderlaag als 'vulling'/halo (dezelfde lijnen, breder en wit, erachter),
+               zodat hij op elke ondergrond van de kaart leesbaar blijft -->
+          <svg viewBox="0 0 32 32" class="block w-full drop-shadow-sm" :class="tent ? 'tent-bounce' : ''">
+            <g transform="translate(5.2 5.2) scale(0.9)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <g stroke="#fff" stroke-width="6.5">
+                <path d="M3.5 21 14 3" />
+                <path d="M20.5 21 10 3" />
+                <path d="M15.5 21 12 15l-3.5 6" />
+                <path d="M2 21h20" />
+              </g>
+              <g stroke="#000" stroke-width="2.2">
+                <path d="M3.5 21 14 3" />
+                <path d="M20.5 21 10 3" />
+                <path d="M15.5 21 12 15l-3.5 6" />
+                <path d="M2 21h20" />
+              </g>
             </g>
           </svg>
         </div>

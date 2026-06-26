@@ -252,9 +252,33 @@ h1, h2, h3, h4 {
   @apply text-black;
 }
 
-/* Tent-cursor voor de plattegrond: een mini-versie van de marker (lila cirkel
-   met zwart tent-icoon), zodat op desktop meteen duidelijk is dat je een tent
-   kunt plaatsen. Hotspot in het midden van de cirkel. */
+/* Tent-cursor voor de plattegrond: een mini-versie van de marker — alleen het
+   tent-icoon (geen cirkel), zwart met een witte onderlaag als vulling/halo, zodat
+   op desktop meteen duidelijk is dat je een tent kunt plaatsen en hij op elke
+   ondergrond leesbaar blijft. Hotspot in het midden. */
 .cursor-tent {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><g opacity='0.7'><circle cx='24' cy='24' r='21' fill='%23a48dbe' stroke='%23000' stroke-width='3'/><g transform='translate(10 10) scale(1.1667)' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 21 14 3'/><path d='M20.5 21 10 3'/><path d='M15.5 21 12 15l-3.5 6'/><path d='M2 21h20'/></g></g></svg>") 24 24, copy;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><g opacity='0.9' transform='translate(10 10) scale(1.1667)' fill='none' stroke-linecap='round' stroke-linejoin='round'><g stroke='white' stroke-width='6'><path d='M3.5 21 14 3'/><path d='M20.5 21 10 3'/><path d='M15.5 21 12 15l-3.5 6'/><path d='M2 21h20'/></g><g stroke='%23000' stroke-width='2'><path d='M3.5 21 14 3'/><path d='M20.5 21 10 3'/><path d='M15.5 21 12 15l-3.5 6'/><path d='M2 21h20'/></g></g></svg>") 24 24, copy;
+}
+
+/* Geplaatste tent: elke 2s drie kleine sprongetjes, daarna rust — zodat de marker
+   opvalt op de kaart. Verticale verschuiving in % (van de markergrootte) zodat de
+   sprong meeschaalt met de zoom. transform-origin onderaan, zodat hij vanaf zijn voet
+   'opspringt'. Per segment een andere timing zodat het op een sprong lijkt: snel
+   omhoog en afremmen naar de top (ease-out), dan versnellend terugvallen (ease-in). */
+@keyframes tent-bounce {
+  0%   { transform: translateY(0);    animation-timing-function: ease-out; }
+  6%   { transform: translateY(-15%); animation-timing-function: ease-in; }
+  12%  { transform: translateY(0);    animation-timing-function: ease-out; }
+  18%  { transform: translateY(-11%); animation-timing-function: ease-in; }
+  24%  { transform: translateY(0);    animation-timing-function: ease-out; }
+  30%  { transform: translateY(-7%);  animation-timing-function: ease-in; }
+  36%  { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+.tent-bounce {
+  transform-origin: bottom center;
+  animation: tent-bounce 2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tent-bounce { animation: none; }
 }
