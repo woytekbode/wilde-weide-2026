@@ -150,8 +150,8 @@ const stages = computed<StageRow[]>(() => {
 
 // eerste 3 altijd zichtbaar; de rest staat ingeklapt in de DOM zodat de
 // uitklap-animatie (grid-rows 0fr→1fr) ze kan onthullen
-const eersteStages = computed(() => stages.value.slice(0, 3))
-const extraStages = computed(() => stages.value.slice(3))
+const eersteStages = computed(() => stages.value.slice(0, 5))
+const extraStages = computed(() => stages.value.slice(5))
 
 // smoothing-gewicht als de mediaan ontaardt (bv. alle genres één engaged act)
 const GENRE_SHRINK_FALLBACK = 3
@@ -304,7 +304,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                 </div>
               </div>
               <div class="shrink-0 text-right">
-                <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none tabular-nums">
+                <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-tight tabular-nums">
                   <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                 </div>
                 <div class="mt-1.5 text-2xs font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
@@ -356,7 +356,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
                     </div>
                   </div>
                   <div class="shrink-0 text-right">
-                    <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-none tabular-nums">
+                    <div class="flex items-center justify-end gap-1 font-display text-lg font-black leading-tight tabular-nums">
                       <HeartMarks :filled="1" size="size-4" />{{ row.hearts }}
                     </div>
                     <div class="mt-1.5 text-2xs font-bold text-black/40 tabular-nums">{{ row.groups }} groep{{ row.groups === 1 ? '' : 'en' }}</div>
@@ -389,10 +389,11 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           </div>
           <ul class="divide-y-2 divide-black/10">
             <li
-              v-for="row in eersteStages"
+              v-for="(row, i) in eersteStages"
               :key="row.stage"
               class="flex items-center gap-3 px-4 py-2.5"
             >
+              <span class="w-5 shrink-0 text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 1 }}</span>
               <StageBadge :stage="row.stage" size="sm" />
               <div class="flex-1" />
               <div class="flex items-center gap-4 text-right tabular-nums">
@@ -415,10 +416,11 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
             <div class="overflow-hidden">
               <ul class="divide-y-2 divide-black/10 border-t-2 border-black/10">
                 <li
-                  v-for="row in extraStages"
+                  v-for="(row, i) in extraStages"
                   :key="row.stage"
                   class="flex items-center gap-3 px-4 py-2.5"
                 >
+                  <span class="w-5 shrink-0 text-center font-display text-lg font-black tabular-nums text-black/40">{{ i + 6 }}</span>
                   <StageBadge :stage="row.stage" size="sm" />
                   <div class="flex-1" />
                   <div class="flex items-center gap-4 text-right tabular-nums">
@@ -435,7 +437,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
           </div>
 
           <button
-            v-if="stages.length > 3"
+            v-if="stages.length > 5"
             type="button"
             class="flex w-full cursor-pointer items-center justify-center border-t-2 border-black/10 py-0.5 text-black transition-colors hover:bg-black/5"
             :aria-label="alleStages ? 'Toon minder podia' : `Toon alle ${stages.length} podia`"
