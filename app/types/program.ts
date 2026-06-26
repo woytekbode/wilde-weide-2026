@@ -25,6 +25,8 @@ export interface SourceAct {
   /** naam van de curator; letterlijk 'curator' = is zelf curator */
   curator: string | null
   spotify: string | null
+  /** optionele SoundCloud-link; fallback voor de luister-knop als spotify ontbreekt */
+  soundcloud?: string | null
 }
 
 export interface FestivalDay {

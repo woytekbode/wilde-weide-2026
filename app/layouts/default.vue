@@ -46,11 +46,13 @@ const pageColor = computed<string>(() => {
   return (route.meta.wwBg as string) ?? 'lila'
 })
 
-// Geef de paginakleur ook aan <html> door, zodat de scrollbar-gutter
-// (in main.css) dezelfde achtergrondkleur krijgt als de pagina.
+// Geef de paginakleur ook aan <html> door: --ww-page-bg zodat de scrollbar-gutter
+// (in main.css) dezelfde achtergrondkleur krijgt, én --ww-accent zodat overlays die
+// uit de layout-div worden geteleporteerd (de slideover, in <body>) de paginakleur
+// erven i.p.v. terug te vallen op lila.
 useHead({
   htmlAttrs: {
-    style: computed(() => `--ww-page-bg: ${ACCENT_VARS[pageColor.value]}`)
+    style: computed(() => `--ww-page-bg: ${ACCENT_VARS[pageColor.value]}; --ww-accent: ${ACCENT_VARS[pageColor.value]}`)
   }
 })
 </script>

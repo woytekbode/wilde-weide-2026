@@ -45,6 +45,9 @@ const metaLine = computed(() =>
   [act.value?.style, act.value?.type, act.value?.country].filter(Boolean).join(' · ')
 )
 
+// luister-knop: Spotify heeft voorrang; valt terug op SoundCloud als die er niet is
+const listenUrl = computed(() => act.value?.spotify || act.value?.soundcloud || null)
+
 // deelbare link kopiëren: de URL bevat al ?act=<id> zolang de slideover open is
 const copied = ref(false)
 let copiedTimer: ReturnType<typeof setTimeout> | undefined
@@ -68,7 +71,29 @@ async function copyLink() {
         <div class="mx-auto max-w-2xl space-y-4">
           <div class="flex items-start justify-between gap-3">
             <h2 class="font-display text-3xl font-black leading-tight">{{ act.artist }}</h2>
-            <button class="ww-btn-solid shrink-0 px-3!" aria-label="Sluiten" @click="open = false">✕</button>
+            <div class="flex shrink-0 items-center gap-2">
+              <a
+                v-if="listenUrl"
+                :href="listenUrl"
+                target="_blank"
+                rel="noopener"
+                class="ww-nav-btn size-9 shrink-0 justify-center px-0!"
+                :title="act.spotify ? 'Luister op Spotify' : 'Luister op SoundCloud'"
+                :aria-label="act.spotify ? 'Luister op Spotify' : 'Luister op SoundCloud'"
+              >
+                <UIcon name="i-lucide-headphones" class="size-5" />
+              </a>
+              <!-- ronde icoonknop: de check bevestigt het kopiëren van de deel-link -->
+              <button
+                class="ww-nav-btn size-9 shrink-0 justify-center px-0!"
+                :title="copied ? 'Link gekopieerd' : 'Kopieer link'"
+                :aria-label="copied ? 'Link gekopieerd' : 'Kopieer link'"
+                @click="copyLink"
+              >
+                <UIcon :name="copied ? 'i-lucide-check' : 'i-lucide-link'" class="size-5" />
+              </button>
+              <button class="ww-nav-btn size-9 shrink-0 justify-center px-0!" aria-label="Sluiten" @click="open = false">✕</button>
+            </div>
           </div>
 
           <div class="flex flex-wrap items-center gap-2 text-sm font-bold">
@@ -133,25 +158,6 @@ async function copyLink() {
             {{ act.liveImpression }}
           </div>
 
-          <div class="flex flex-wrap items-center gap-2">
-            <a
-              v-if="act.spotify"
-              :href="act.spotify"
-              target="_blank"
-              rel="noopener"
-              class="ww-btn-solid"
-            >▶ Luister op Spotify</a>
-            <!-- compacte icoonknop: past altijd naast Spotify en verspringt niet
-                 bij het wisselen; de check bevestigt het kopiëren -->
-            <button
-              class="ww-btn-solid shrink-0 px-3!"
-              :title="copied ? 'Link gekopieerd' : 'Kopieer link'"
-              :aria-label="copied ? 'Link gekopieerd' : 'Kopieer link'"
-              @click="copyLink"
-            >
-              <UIcon :name="copied ? 'i-lucide-check' : 'i-lucide-link'" class="size-5" />
-            </button>
-          </div>
         </div>
       </div>
     </template>

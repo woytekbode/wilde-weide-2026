@@ -40,7 +40,7 @@ if (import.meta.client) {
         <div class="mx-auto max-w-2xl space-y-4">
           <div class="flex items-start justify-between gap-3">
             <h2 class="font-display text-3xl font-black leading-tight">Snap je er niks van?</h2>
-            <button class="ww-btn-solid shrink-0 px-3!" aria-label="Sluiten" @click="closeLegend">✕</button>
+            <button class="ww-nav-btn size-9 shrink-0 justify-center px-0!" aria-label="Sluiten" @click="closeLegend">✕</button>
           </div>
 
           <div class="divide-y-2 divide-black/10">
