@@ -153,15 +153,9 @@ const stages = computed<StageRow[]>(() => {
 const eersteStages = computed(() => stages.value.slice(0, 5))
 const extraStages = computed(() => stages.value.slice(5))
 
-// smoothing-gewicht als de mediaan ontaardt (bv. alle genres één engaged act)
-const GENRE_SHRINK_FALLBACK = 3
-
-const mediaan = (xs: number[]): number => {
-  if (!xs.length) return 0
-  const s = [...xs].sort((a, b) => a - b)
-  const mid = Math.floor(s.length / 2)
-  return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2
-}
+// aantal nul-hartjes-"fantoom" acts dat we elk genre toevoegen (zie score hieronder);
+// grotere M = sterkere straf op kleine genres. Vast ingesteld i.p.v. de mediaan.
+const GENRE_SHRINK_M = 4
 
 // Per genre een geregulariseerd gemiddelde over de "engaged" acts (acts met ≥1
 // hartje). We delen de gewogen hartjes door het aantal engaged acts i.p.v. álle
@@ -184,9 +178,7 @@ const genres = computed<GenreRow[]>(() => {
   const rows = [...m.entries()]
   if (!rows.length) return []
 
-  // M = mediaan engaged acts per genre = het aantal nul-hartjes-fantoomacts dat we
-  // elk genre toevoegen (grotere M = sterkere straf op kleine genres)
-  const M = mediaan(rows.map(([, v]) => v.engaged)) || GENRE_SHRINK_FALLBACK
+  const M = GENRE_SHRINK_M
 
   return rows
     .map(([genre, v]) => {
