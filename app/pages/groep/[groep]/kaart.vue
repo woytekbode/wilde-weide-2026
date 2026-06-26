@@ -330,13 +330,15 @@ onScopeDispose(() => {
           @load="onImgLoad"
         >
         <!-- marker als SVG met breedte in % van de kaart, zodat de verhouding
-             marker:kaart op elk schermformaat gelijk blijft (clamp houdt 'm op
-             een klein scherm leesbaar). Schaalt mee met de zoom omdat hij in de
-             getransformeerde wrapper zit. -->
+             marker:kaart op elk schermformaat gelijk blijft. Géén bovengrens: die
+             zit in de niet-geschaalde beeldcoördinaten en zou op desktop (breed
+             beeld, daarna uitgezoomd) toeslaan en de marker kleiner maken dan op
+             mobiel. max() houdt 'm alleen op een klein scherm leesbaar. Schaalt mee
+             met de zoom omdat hij in de getransformeerde wrapper zit. -->
         <div
           class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 transition-opacity"
           :class="tent ? '' : 'opacity-60'"
-          :style="{ left: `${tentPos.fx * 100}%`, top: `${tentPos.fy * 100}%`, width: 'clamp(20px, 6.5%, 64px)' }"
+          :style="{ left: `${tentPos.fx * 100}%`, top: `${tentPos.fy * 100}%`, width: 'max(20px, 6.5%)' }"
         >
           <!-- alleen het tent-icoon (geen cirkel): zwart icoon met een witte
                onderlaag als 'vulling'/halo (dezelfde lijnen, breder en wit, erachter),
