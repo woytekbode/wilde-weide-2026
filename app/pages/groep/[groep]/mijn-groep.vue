@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { GROEPSWISSEL_QUERY } from '#shared/groep'
+import { MESSAGE_SHARE_TEXT_DEFAULT } from '#shared/message'
 
 definePageMeta({ wwBg: 'lila' })
 
@@ -12,11 +13,25 @@ onMounted(() => {
   deelLink.value = `${location.origin}/groep/${groep.value}`
 })
 
+// Delen via de OS-deelsheet (zelfde aanpak als de 'Deel je groep'-knop in het
+// festivalbericht): op Android zit 'Kopiëren' in die sheet, dus de link blijft
+// te kopiëren. Waar navigator.share ontbreekt (desktop) valt het terug op het
+// klembord; de link staat sowieso in het kader hierboven.
 const gekopieerd = ref(false)
-async function kopieerLink() {
+let kopieerTimer: ReturnType<typeof setTimeout> | undefined
+async function deelLinkActie() {
+  const text = MESSAGE_SHARE_TEXT_DEFAULT.share
+  if (navigator.share) {
+    try {
+      await navigator.share({ text, url: deelLink.value })
+    } catch { /* geannuleerd: niks doen */ }
+    return
+  }
   try {
-    await navigator.clipboard.writeText(deelLink.value)
+    await navigator.clipboard.writeText(`${text} ${deelLink.value}`)
     gekopieerd.value = true
+    clearTimeout(kopieerTimer)
+    kopieerTimer = setTimeout(() => (gekopieerd.value = false), 1500)
   } catch {
     useToast().add({ title: 'Kopiëren mislukt — kopieer de link handmatig', color: 'error' })
   }
@@ -35,14 +50,14 @@ async function kopieerLink() {
         <button
           class="relative flex-1"
           :class="gekopieerd ? 'ww-btn' : 'ww-btn-solid'"
-          @click="kopieerLink"
+          @click="deelLinkActie"
         >
-          {{ gekopieerd ? 'Link gekopieerd' : 'Kopieer link' }}
+          {{ gekopieerd ? 'Link gekopieerd' : 'Deel mijn groep' }}
           <span
             class="absolute right-1 top-1/2 flex size-7 shrink-0 -translate-y-1/2 items-center justify-center rounded-full"
             :class="gekopieerd ? 'bg-black text-white' : 'ww-btn-circle'"
           >
-            <UIcon :name="gekopieerd ? 'i-lucide-check' : 'i-lucide-link'" class="size-4" />
+            <UIcon :name="gekopieerd ? 'i-lucide-check' : 'i-lucide-share-2'" class="size-4" />
           </span>
         </button>
         <NuxtLink :to="`/groep/${groep}`" class="ww-btn-solid relative flex-1 text-center">
