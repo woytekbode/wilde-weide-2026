@@ -197,24 +197,17 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
 </script>
 
 <template>
-  <div class="mx-auto max-w-xl space-y-4 pt-4">
+  <div class="space-y-4">
     <p v-if="bezig" class="text-sm font-bold">Laden…</p>
     <p v-else-if="fout" class="text-sm font-bold text-red-700">{{ fout }}</p>
 
     <template v-else>
-      <div class="ww-card flex items-center justify-around gap-4 p-5 text-center">
-        <div>
-          <div class="font-display text-4xl font-black tabular-nums">{{ totaal.groepen }}</div>
-          <div class="text-sm font-bold">groepen</div>
-        </div>
-        <div>
-          <div class="font-display text-4xl font-black tabular-nums">{{ totaal.active }}</div>
-          <div class="text-sm font-bold">actief</div>
-        </div>
-        <div>
-          <div class="font-display text-4xl font-black tabular-nums">{{ totaal.likes }}</div>
-          <div class="text-sm font-bold">hartjes</div>
-        </div>
+      <div class="ww-card p-4 text-sm font-bold leading-relaxed">
+        De
+        <span class="font-display text-lg font-black tabular-nums">{{ totaal.active }}</span>
+        groepen in de Wilde Weide Vriendenplek hebben samen
+        <span class="font-display text-lg font-black tabular-nums">{{ totaal.likes }}</span>
+        hartjes uitgedeeld.
       </div>
 
       <p v-if="leeg" class="ww-card p-5 text-sm font-bold text-black/60">
@@ -250,7 +243,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         </section>
 
         <!-- Top 10 acts: gewogen hartjes (1/2/3) opgeteld over alle groepen -->
-        <section class="ww-card overflow-hidden">
+        <section class="ww-card mx-auto max-w-3xl overflow-hidden">
           <div class="border-b-[3px] border-black bg-lila-200 px-4 py-2">
             <h2 class="font-display text-lg font-black">Acts</h2>
           </div>
@@ -374,7 +367,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
         </section>
 
         <!-- Per podium: opgetelde hartjes, gemiddelde per act, aantal acts -->
-        <section class="ww-card overflow-hidden">
+        <section class="ww-card mx-auto max-w-3xl overflow-hidden">
           <div class="border-b-[3px] border-black bg-oker-200 px-4 py-2">
             <h2 class="font-display text-lg font-black">Podia</h2>
           </div>
@@ -445,7 +438,7 @@ const pct = (n: number) => `${Math.round(n * 100)}%`
 
         <!-- Per genre: balk = relatieve Bayesiaanse score (kwaliteit × bereik over
              de engaged acts); de tekst toont de rauwe cijfers erachter -->
-        <section class="ww-card overflow-hidden">
+        <section class="ww-card mx-auto max-w-3xl overflow-hidden">
           <div class="border-b-[3px] border-black bg-veld-200 px-4 py-2">
             <h2 class="font-display text-lg font-black">Genres</h2>
           </div>
