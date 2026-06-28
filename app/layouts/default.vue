@@ -129,5 +129,6 @@ useHead({
 
     <ActDetailsSlideover />
     <LegendModal />
+    <BroadcastMessage />
   </div>
 </template>

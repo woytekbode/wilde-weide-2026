@@ -13,6 +13,8 @@
 
 import type { AdminGroep, GroepenRegister, GroepScoreMap, GroepSfeerMap, GroepStats, GroepTent, LikeAggregateMap } from '../shared/groep'
 import { GROEPEN_KEY, groepSlug, isAdminGroep, isGeldigeGroepSlug, isGeldigeSid, scoresKey, sfeerKey, statsKey, tentKey, summarizeStats } from '../shared/groep'
+import type { BroadcastMessage } from '../shared/message'
+import { MESSAGE_KEY, buildMessage, isExpired } from '../shared/message'
 
 interface Env {
   SCORES: {
@@ -162,6 +164,40 @@ export default {
       delete groepen[slug]
       await env.SCORES.put(GROEPEN_KEY, JSON.stringify(groepen))
       return json({ ok: true })
+    }
+
+    // Beheer van het globale festivalbericht: zetten (POST) of wissen (DELETE).
+    if (url.pathname === '/api/admin/message') {
+      const onbevoegd = vereisAdmin(request, env)
+      if (onbevoegd) return onbevoegd
+
+      if (request.method === 'DELETE') {
+        await env.SCORES.delete(MESSAGE_KEY)
+        return json({ ok: true })
+      }
+      if (request.method !== 'POST') {
+        return json({ error: 'method not allowed' }, 405)
+      }
+      const body = await leesBody(request)
+      if (!body) {
+        return json({ error: 'ongeldige JSON' }, 400)
+      }
+      const bestaand = await env.SCORES.get<BroadcastMessage>(MESSAGE_KEY, 'json')
+      const res = buildMessage(body, bestaand, Date.now(), () => crypto.randomUUID())
+      if (!res.ok) {
+        return json({ error: res.error }, 400)
+      }
+      await env.SCORES.put(MESSAGE_KEY, JSON.stringify(res.message))
+      return json(res.message)
+    }
+
+    // Publiek festivalbericht: één blob, leesbaar zonder token. Verlopen → null.
+    if (url.pathname === '/api/message') {
+      if (request.method !== 'GET') {
+        return json({ error: 'method not allowed' }, 405)
+      }
+      const msg = await env.SCORES.get<BroadcastMessage>(MESSAGE_KEY, 'json')
+      return json(isExpired(msg) ? null : msg ?? null)
     }
 
     // Publieke stats: dezelfde geaggregeerde, niet-persoonlijke cijfers die het

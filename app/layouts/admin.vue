@@ -22,7 +22,8 @@ function ontgrendel() {
 
 const nav = [
   { to: '/badmeester', label: 'Groepen', icon: 'i-lucide-users' },
-  { to: '/badmeester/stats', label: 'Stats', icon: 'i-lucide-bar-chart-3' }
+  { to: '/badmeester/stats', label: 'Stats', icon: 'i-lucide-bar-chart-3' },
+  { to: '/badmeester/message', label: 'Bericht', icon: 'i-lucide-megaphone' }
 ]
 
 // vaste paginakleur (lila); geef de gutter dezelfde kleur als de pagina
