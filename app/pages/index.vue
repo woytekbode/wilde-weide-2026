@@ -9,7 +9,6 @@ const { rememberGroep, lastGroep } = useGroep()
 const naam = ref('')
 const bezig = ref(false)
 const fout = ref('')
-const gemaakt = ref<{ slug: string, naam: string } | null>(null)
 
 // pas na mount bekend: localStorage bestaat niet tijdens prerender
 const laatste = ref<{ slug: string, naam: string } | null>(null)
@@ -26,9 +25,6 @@ onMounted(() => {
   laatste.value = last
 })
 
-const deelLink = computed(() => gemaakt.value ? `${location.origin}/groep/${gemaakt.value.slug}` : '')
-const gekopieerd = ref(false)
-
 async function verstuur() {
   const ingevuld = naam.value.trim()
   if (ingevuld.length < 2) {
@@ -43,11 +39,9 @@ async function verstuur() {
       body: { naam: ingevuld }
     })
     rememberGroep(res.slug, res.naam)
-    if (res.bestond) {
-      await navigateTo(`/groep/${res.slug}`)
-    } else {
-      gemaakt.value = res
-    }
+    // bestaande groep → direct het schema in; nieuwe groep → eerst de
+    // 'mijn groep'-pagina met de deelbare link
+    await navigateTo(res.bestond ? `/groep/${res.slug}` : `/groep/${res.slug}/mijn-groep`)
   } catch (err) {
     const data = (err as { data?: { error?: string, statusMessage?: string } }).data
     fout.value = data?.error ?? data?.statusMessage ?? 'Er ging iets mis — probeer het nog eens.'
@@ -55,20 +49,11 @@ async function verstuur() {
     bezig.value = false
   }
 }
-
-async function kopieerLink() {
-  try {
-    await navigator.clipboard.writeText(deelLink.value)
-    gekopieerd.value = true
-  } catch {
-    useToast().add({ title: 'Kopiëren mislukt — kopieer de link handmatig', color: 'error' })
-  }
-}
 </script>
 
 <template>
   <div class="mx-auto max-w-xl space-y-4 pt-4">
-    <div v-if="!gemaakt" class="ww-card space-y-4 p-5">
+    <div class="ww-card space-y-4 p-5">
       <h2 class="font-display text-3xl font-black leading-tight">Met wie ga jij?</h2>
       <p class="text-sm font-bold">
         Verzin een nieuwe groepsnaam of vul een bestaande in. De groepsnaam is je toegangskaartje dus verzin iets unieks!
@@ -96,35 +81,6 @@ async function kopieerLink() {
       >
         Ik hoor al bij {{ laatste.naam }}...
       </NuxtLink>
-    </div>
-
-    <div v-else class="ww-card space-y-4 p-5">
-      <h2 class="font-display text-3xl font-black leading-tight">🌿 Welkom, {{ gemaakt.naam }}! 🌿</h2>
-      <p class="text-sm font-bold">
-        Deel deze link met je vrienden, of vage kennissen.
-      </p>
-      <div class="ww-card-flat bg-stone-50 p-3 text-sm font-bold break-all">{{ deelLink }}</div>
-      <div class="flex flex-col gap-2 sm:flex-row">
-        <button
-          class="relative flex-1"
-          :class="gekopieerd ? 'ww-btn' : 'ww-btn-solid'"
-          @click="kopieerLink"
-        >
-          {{ gekopieerd ? 'Link gekopieerd' : 'Kopieer link' }}
-          <span
-            class="absolute right-1 top-1/2 flex size-7 shrink-0 -translate-y-1/2 items-center justify-center rounded-full"
-            :class="gekopieerd ? 'bg-black text-white' : 'ww-btn-circle'"
-          >
-            <UIcon :name="gekopieerd ? 'i-lucide-check' : 'i-lucide-link'" class="size-4" />
-          </span>
-        </button>
-        <NuxtLink :to="`/groep/${gemaakt.slug}`" class="ww-btn-solid relative flex-1 text-center">
-          Naar mijn groep
-          <span class="ww-btn-circle absolute right-1 top-1/2 -translate-y-1/2">
-            <UIcon name="i-lucide-arrow-right" class="size-4" />
-          </span>
-        </NuxtLink>
-      </div>
     </div>
   </div>
 </template>

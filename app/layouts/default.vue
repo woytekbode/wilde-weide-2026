@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { GROEPSWISSEL_QUERY } from '#shared/groep'
 import { DAY_META } from '~/data/display'
 import type { DayKey } from '~/types/program'
 
 const route = useRoute()
 const { groep, groepNaam } = useGroep()
-const kiesGroepLink = `/?${GROEPSWISSEL_QUERY}`
+const mijnGroepLink = computed(() => `/groep/${groep.value}/mijn-groep`)
 
 const nav = computed(() => {
   const base = `/groep/${groep.value}`
@@ -99,7 +98,7 @@ useHead({
              datum -->
         <template v-if="groep">
           <NuxtLink
-            :to="kiesGroepLink"
+            :to="mijnGroepLink"
             class="underline decoration-2 underline-offset-2"
           >{{ groepNaam || groep }}</NuxtLink> ·
         </template>

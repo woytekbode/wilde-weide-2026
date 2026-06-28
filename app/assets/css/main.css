@@ -146,6 +146,12 @@ h1, h2, h3, h4 {
   @apply flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-black transition-colors duration-200;
 }
 
+/* ronde icoonknop in een outline ww-btn: tegengesteld aan de witte knop
+   (zwarte cirkel, wit icoon), inverteert mee op hover net als ww-btn-circle */
+.ww-btn-circle-outline {
+  @apply flex size-7 shrink-0 items-center justify-center rounded-full bg-black text-white transition-colors duration-200;
+}
+
 /* Navigatie (dagen + hoofdmenu): alleen outline, actief = zwart gevuld met
    tekst in de paginakleur */
 .ww-nav-btn {
@@ -180,6 +186,9 @@ h1, h2, h3, h4 {
 @media (hover: hover) {
   .ww-btn:hover {
     @apply bg-black text-white;
+  }
+  .ww-btn:hover .ww-btn-circle-outline {
+    @apply bg-white text-black;
   }
   .ww-btn-solid:hover {
     @apply bg-white text-black;
