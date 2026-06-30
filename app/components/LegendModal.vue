@@ -1,25 +1,33 @@
 <script setup lang="ts">
 import { stageColor } from '~/data/display'
 
+const route = useRoute()
 const { open, legendPending, openLegend, closeLegend } = useLegend()
 const { groep } = useGroep()
 
-// Eénmalig automatisch tonen zodra er een groep actief is. Geen immediate-watch:
-// die draait synchroon binnen watch() en zou stop() aanroepen vóór stop is
-// geïnitialiseerd (TDZ — crasht bij een directe /groep/<slug>-link). Dus het
-// 'al actief'-geval apart afhandelen, en pas daarna een gewone watch opzetten
-// voor het kiezen van een groep vanaf /.
+// Eénmalig automatisch tonen, en alléén op de programmapagina (route 'groep-groep')
+// — niet op mijn-groep of de subpagina's. De nieuwe-groep-flow landt eerst op
+// mijn-groep met een gezette groep; we wachten tot je echt het schema in komt.
+// Geen immediate-watch: die draait synchroon binnen watch() en zou stop()
+// aanroepen vóór stop is geïnitialiseerd (TDZ — crasht bij een directe
+// /groep/<slug>-link). Dus het 'al op de juiste pagina'-geval apart afhandelen,
+// en pas daarna een gewone watch opzetten. Watch ook op route.name: bij de
+// nieuwe-groep-flow blijft groep gezet terwijl je van mijn-groep naar het schema
+// navigeert.
 onMounted(() => {
   if (!legendPending()) return
-  if (groep.value) {
-    openLegend()
-    return
-  }
-  const stop = watch(groep, (slug) => {
-    if (slug) {
+
+  const tryOpen = () => {
+    if (legendPending() && groep.value && route.name === 'groep-groep') {
       openLegend()
-      stop()
+      return true
     }
+    return false
+  }
+
+  if (tryOpen()) return
+  const stop = watch([groep, () => route.name], () => {
+    if (tryOpen()) stop()
   })
 })
 
