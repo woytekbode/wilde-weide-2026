@@ -66,7 +66,7 @@ function dayAccent(act: Act): string {
           act.score === 3 ? 'shadow-[6px_6px_0_0_#000]!' : act.score === 2 ? 'shadow-[3px_3px_0_0_#000]!' : 'shadow-none!',
           // afgelopen-dimming alleen voor muziek (per optreden); sfeermaker-kaarten
           // staan voor een activiteit met meerdere sessies, dus niet dimmen
-          programme === 'muziek' && actTimeStatus(act, now) === 'past' ? 'opacity-40 grayscale' : ''
+          programme === 'muziek' && !act.timeless && actTimeStatus(act, now) === 'past' ? 'opacity-40 grayscale' : ''
         ]"
         @click="show(act)"
       >
@@ -87,10 +87,10 @@ function dayAccent(act: Act): string {
           <!-- dag/tijd alleen voor muziek (per optreden); sfeermaker-kaarten
                tonen alleen plek + categorie, de tijden staan in het Programma -->
           <span
-            v-if="programme === 'muziek' && actTimeStatus(act, now) === 'now'"
+            v-if="programme === 'muziek' && !act.timeless && actTimeStatus(act, now) === 'now'"
             class="rounded-full border-2 border-black bg-black px-1.5 py-0.5 text-3xs font-black text-white"
           >NU</span>
-          <span v-if="programme === 'muziek'" class="rounded-full border-2 border-black px-1.5 text-3xs font-mono" :class="dayAccent(act)">
+          <span v-if="programme === 'muziek' && !act.timeless" class="rounded-full border-2 border-black px-1.5 text-3xs font-mono" :class="dayAccent(act)">
             {{ dayShort(act) }} {{ act.time }}
           </span>
           <!-- sfeermaker zonder plek (ambient): toon het type i.p.v. een lege pil -->

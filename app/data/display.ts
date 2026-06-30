@@ -91,7 +91,10 @@ export const STAGE_COLORS: Record<string, string> = {
   'Tanker': 'bg-[#d07a5a]',
   // alleen op de donderdag (camping); hergebruikt het blauw van Bud x Lodge,
   // dat die dag niet open is — botst dus nergens
-  'De Spot': 'bg-[#a3c2cf]'
+  'De Spot': 'bg-[#a3c2cf]',
+  // takeover-collectief zonder vast tijdslot/plek: staat nooit als kolom in het
+  // blokkenschema (geen dag-acts), dus de kleur botst nergens — alleen op kaarten
+  'House of Chi': 'bg-[#c8b6e2]'
 }
 
 /**

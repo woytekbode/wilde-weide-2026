@@ -29,6 +29,14 @@ export interface SourceAct {
   soundcloud?: string | null
 }
 
+/** muziek-act zonder vast tijdslot/plek (timeless): zelfde velden, maar tijd/plek mogen null zijn */
+export interface UnscheduledSourceAct extends Omit<SourceAct, 'time' | 'start' | 'end' | 'stage'> {
+  time: string | null
+  start: string | null
+  end: string | null
+  stage: string | null
+}
+
 export interface FestivalDay {
   day: string
   date: string
@@ -46,6 +54,8 @@ export interface Program {
     legend: Record<string, string>
   }
   days: FestivalDay[]
+  /** muziek-acts zonder vast tijdslot/plek (bv. een takeover-collectief); timeless, buiten elk dagschema */
+  unscheduled?: UnscheduledSourceAct[]
 }
 
 export type DayKey = 'donderdag' | 'vrijdag' | 'zaterdag' | 'zondag'

@@ -95,8 +95,41 @@ function assemble(days: SourceDay[], programme: Programme, idPrefix: string): Ac
   return acts.sort((a, b) => a.dayDate.localeCompare(b.dayDate) || a.startMin - b.startMin || a.stage.localeCompare(b.stage))
 }
 
+/**
+ * Muziek-acts zonder vast tijdslot/plek (bv. een takeover-collectief als House of
+ * Chi): timeless Acts met dayKey null, dus buiten elk dagschema en de
+ * conflictdetectie, maar wél als kaart op de acts-pagina. Niet via assemble(): die
+ * rekent startMin uit `start` en leidt een dayKey af. Behoudt de volledige
+ * muziek-velden (genre/style/spotify/…); zelf-host weglaten zodat de slideover geen
+ * 'onderdeel van <zichzelf>' toont.
+ */
+function buildUnscheduledMusicActs(): Act[] {
+  return (typedMusic.unscheduled ?? []).map((src) => {
+    const id = slugify(src.artist)
+    return {
+      ...src,
+      time: src.time ?? '',
+      start: src.start ?? '',
+      end: src.end ?? '',
+      stage: src.stage ?? '',
+      host: src.host && src.host !== src.stage ? src.host : null,
+      id,
+      scoreKey: id,
+      programme: 'muziek',
+      dayKey: null,
+      dayLabel: '',
+      dayDate: '',
+      startMin: 0,
+      endMin: 0,
+      score: null,
+      status: 'unscored',
+      timeless: true
+    }
+  })
+}
+
 export function buildActs(): Act[] {
-  return assemble(typedMusic.days, 'muziek', '')
+  return [...assemble(typedMusic.days, 'muziek', ''), ...buildUnscheduledMusicActs()]
 }
 
 /**
