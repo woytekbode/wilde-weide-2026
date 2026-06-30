@@ -66,7 +66,7 @@ Read-modify-write per blob is last-write-wins; voor een vriendengroep prima. Er 
 
 ## Data
 
-Alle programma-data staat in [app/data/wildeweide-programma.json](app/data/wildeweide-programma.json) en wordt build-time geïmporteerd. Structuur: `{ "festival": { name, dates, location, stages[], types[], genres[], legend }, "days": [{ day, date, acts: [...] }] }`, per act:
+Alle programma-data staat in [app/data/wildeweide-programma-totaal.json](app/data/wildeweide-programma-totaal.json) en wordt build-time geïmporteerd. Het bestand heeft twee secties — `muziek` en `sfeermakers` — die nooit tegelijk getoond worden; elk heeft de vorm `{ "festival": { name, dates, location, stages[], types[], (genres[] | categories[]), legend }, "days": [{ day, date, acts: [...] }] }`. Een muziek-act:
 
 ```json
 {
@@ -95,7 +95,7 @@ Alle programma-data staat in [app/data/wildeweide-programma.json](app/data/wilde
 - `liveRep`: live-reputatie 1–3 (✦), alleen extra context
 - acts ná middernacht horen bij de festivaldag waaronder ze genest staan (de ISO-datum loopt dan een dag voor)
 
-De sfeermakers staan in [app/data/wildeweide-sfeermakers.json](app/data/wildeweide-sfeermakers.json), de podium-sfeer in [app/data/wildeweide-stages.json](app/data/wildeweide-stages.json), en de badge-kleuren per genre/podium in [app/data/display.ts](app/data/display.ts).
+De sfeermakers vormen de tweede sectie (`sfeermakers`) van datzelfde bestand: zelfde vorm, maar met `categories[]` i.p.v. `genres[]` (en `category` per act), zonder de muziek-only velden (style, liveRep, …), plus een `unscheduled[]` voor sfeermakers zonder vast tijdslot/plek. De podium-sfeer staat in [app/data/wildeweide-stages.json](app/data/wildeweide-stages.json), en de badge-kleuren per genre/podium in [app/data/display.ts](app/data/display.ts).
 
 ## Deployen (Cloudflare Workers Builds)
 

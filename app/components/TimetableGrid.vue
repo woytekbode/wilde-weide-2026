@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Act, DayKey, Programme } from '~/types/program'
-import { actTimeStatus, festivalDayKeyFor, minToHour, stageColor } from '~/data/display'
+import { actTimeStatus, festivalDayKeyFor, minToHour, stageColor, stageLabel } from '~/data/display'
 
 const props = withDefaults(defineProps<{ day: DayKey, programme?: Programme }>(), { programme: 'muziek' })
 
@@ -189,13 +189,13 @@ function blockStyle(act: Act) {
       <button
         v-for="(stage, i) in stages"
         :key="stage"
-        class="mb-1.5 cursor-pointer rounded-full border-[3px] border-black py-1 text-center text-xs font-bold transition-transform hover:scale-95 motion-safe:active:scale-95"
+        class="mb-1.5 cursor-pointer truncate rounded-full border-[3px] border-black px-1 py-1 text-center text-xs font-bold transition-transform hover:scale-95 motion-safe:active:scale-95"
         :class="[stageColor(stage, programme), { 'ww-stage-squish': hintSquish }]"
         :style="{ gridColumn: String(i + 2), gridRow: '1', viewTransitionName: `stage-${slugify(stage)}`, viewTransitionClass: 'ww-chip', animationDelay: hintSquish ? `${i * 90}ms` : undefined }"
-        title="verberg stage"
+        :title="`${stage} — klik om te verbergen`"
         @click="toggleStage(stage)"
       >
-        {{ stage }}
+        {{ stageLabel(stage) }}
       </button>
 
       <!-- doorlopende tijdkolom-vulling: één item over alle datarijen zodat de

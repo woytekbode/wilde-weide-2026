@@ -1,7 +1,7 @@
 {
   "festival": "Wilde Weide 2026",
   "doel": "Voel je mood. Kies je podium.",
-  "bron": "wildeweide-programma.json",
+  "bron": "wildeweide-programma-totaal.json",
   "days": [
     {
       "day": "Vrijdag 3 juli 2026",

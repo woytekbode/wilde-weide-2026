@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SCORE_OPTIONS, stageColor } from '~/data/display'
+import { SCORE_OPTIONS, stageColor, stageLabel } from '~/data/display'
 import type { DayKey, Programme } from '~/types/program'
 
 const props = withDefaults(defineProps<{ programme?: Programme }>(), { programme: 'muziek' })
@@ -44,9 +44,9 @@ const dayHiddenStages = computed(() => {
         class="inline-flex cursor-pointer items-center gap-1 rounded-full border-[3px] border-black py-1 pl-3 pr-2 text-xs font-bold transition-transform motion-safe:active:scale-95"
         :class="stageColor(stage, programme)"
         :style="{ viewTransitionName: `stage-${slugify(stage)}`, viewTransitionClass: 'ww-chip' }"
-        title="toon podium"
+        :title="`${stage} — klik om te tonen`"
         @click="toggleStage(stage)"
-      >{{ stage }}<UIcon name="i-lucide-x" class="size-3.5" /></button>
+      >{{ stageLabel(stage) }}<UIcon name="i-lucide-x" class="size-3.5" /></button>
     </div>
 
     <!-- programmawissel; zelfde chip-stijl als de hartjesfilter. sm:ml-auto duwt

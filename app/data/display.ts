@@ -1,5 +1,7 @@
 import type { DayKey, Programme } from '~/types/program'
-import sfeerProgram from '~/data/wildeweide-er-is-nog-meer-programma.json'
+import program from '~/data/wildeweide-programma-totaal.json'
+
+const sfeerProgram = program.sfeermakers
 
 export interface DayMeta {
   key: DayKey
@@ -90,6 +92,22 @@ export const STAGE_COLORS: Record<string, string> = {
   // alleen op de donderdag (camping); hergebruikt het blauw van Bud x Lodge,
   // dat die dag niet open is — botst dus nergens
   'De Spot': 'bg-[#a3c2cf]'
+}
+
+/**
+ * Korte weergavenamen voor podia met een lange naam, alleen voor de chips in het
+ * blokkenschema (kolomkop + filterbalk): die staan in een vaste kolombreedte, dus
+ * een lange naam wrapt naar twee regels en rekt — via grid-stretch — álle chips
+ * even hoog uit. `stage` zelf (de sleutel voor matching, kleuren en scores) blijft
+ * ongewijzigd; de volledige naam staat in de tooltip. StageBadge (kaarten/stats/
+ * slideover) groeit in breedte i.p.v. hoogte en toont gewoon de volledige naam.
+ */
+export const STAGE_LABELS: Record<string, string> = {
+  'Radio de Koperen Hond': 'Koperen Hond'
+}
+
+export function stageLabel(stage: string): string {
+  return STAGE_LABELS[stage] ?? stage
 }
 
 /**

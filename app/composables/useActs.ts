@@ -1,8 +1,7 @@
-import musicProgram from '~/data/wildeweide-programma.json'
-import sfeerProgram from '~/data/wildeweide-er-is-nog-meer-programma.json'
+import program from '~/data/wildeweide-programma-totaal.json'
 import type { Act, Conflict, DayKey, Program, Programme, SourceAct } from '~/types/program'
 
-const typedMusic = musicProgram as unknown as Program
+const typedMusic = program.muziek as unknown as Program
 
 /**
  * Sfeermaker-programma: zelfde vorm als het muziekprogramma, maar met `category`
@@ -36,7 +35,7 @@ interface SfeerProgram {
   days: { day: string, date: string, acts: SfeerSourceAct[] }[]
   unscheduled?: SfeerUnscheduled[]
 }
-const typedSfeer = sfeerProgram as unknown as SfeerProgram
+const typedSfeer = program.sfeermakers as unknown as SfeerProgram
 
 export function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
