@@ -66,7 +66,7 @@ useHead({
     :class="[BG_CLASSES[pageColor], fullscreen ? 'flex h-dvh min-h-0 flex-col overflow-hidden' : 'min-h-screen pb-24 lg:pb-10']"
     :style="{ '--ww-accent': ACCENT_VARS[pageColor] }"
   >
-    <header class="mx-auto w-full max-w-7xl shrink-0 px-4 pt-5 pb-4 lg:px-8" :class="{ 'max-lg:hidden': fullscreen }">
+    <header class="mx-auto w-full max-w-344 shrink-0 px-4 pt-5 pb-4 lg:px-8" :class="{ 'max-lg:hidden': fullscreen }">
       <!-- titelrij + nav delen één regel en lijnen onderaan uit; de pilhoogte
            valt samen met de teksthoogte, dus de bovenkanten lopen ook gelijk -->
       <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 lg:flex-nowrap">
@@ -108,7 +108,7 @@ useHead({
 
     <main
       class="mx-auto"
-      :class="fullscreen ? 'max-w-none flex-1 min-h-0 px-0' : 'max-w-7xl px-4 lg:px-8'"
+      :class="fullscreen ? 'max-w-none flex-1 min-h-0 px-0' : 'max-w-344 px-4 lg:px-8'"
     >
       <slot />
     </main>
